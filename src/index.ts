@@ -1,12 +1,15 @@
 import { Hono } from 'hono'
-import { InMemoryArticleRepository } from '../internal/adapters/gateways/in-memory-article-repository.js'
+import { PostgresArticleRepository } from '../internal/adapters/gateways/postgres-article-repository.js'
 import { ArticleUseCase } from '../internal/application/usecase/article-usecase.js'
 import { createArticleRouter } from '../internal/router/article-router.js'
 
 const app = new Hono()
 
+// Get database URL from environment variable
+const DATABASE_URL = process.env.DATABASE_URL || 'postgres://postgres:password@localhost:5432/romanticist'
+
 // Dependency Injection - Wiring up the Hexagonal Architecture
-const articleRepository = new InMemoryArticleRepository()
+const articleRepository = new PostgresArticleRepository(DATABASE_URL)
 const articleUseCase = new ArticleUseCase(articleRepository)
 const articleRouter = createArticleRouter(articleUseCase)
 

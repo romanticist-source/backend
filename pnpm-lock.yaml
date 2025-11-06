@@ -11,6 +11,9 @@ importers:
       hono:
         specifier: ^4.10.2
         version: 4.10.2
+      postgres:
+        specifier: ^3.4.7
+        version: 3.4.7
     devDependencies:
       '@types/node':
         specifier: ^20.11.17
@@ -200,6 +203,10 @@ packages:
     resolution: {integrity: sha512-p6fyzl+mQo6uhESLxbF5WlBOAJMDh36PljwlKtP5V1v09NxlqGru3ShK+4wKhSuhuYf8qxMmrivHOa/M7q0sMg==}
     engines: {node: '>=16.9.0'}
 
+  postgres@3.4.7:
+    resolution: {integrity: sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw==}
+    engines: {node: '>=12'}
+
   resolve-pkg-maps@1.0.0:
     resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
 
@@ -337,6 +344,8 @@ snapshots:
       resolve-pkg-maps: 1.0.0
 
   hono@4.10.2: {}
+
+  postgres@3.4.7: {}
 
   resolve-pkg-maps@1.0.0: {}
 

@@ -1,8 +1,14 @@
 {
   "name": "hono",
   "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "db:init": "tsx scripts/init-db.ts",
+    "db:setup": "pnpm db:init"
+  },
   "dependencies": {
-    "hono": "^4.10.2"
+    "hono": "^4.10.2",
+    "postgres": "^3.4.7"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
