@@ -2,6 +2,9 @@ import { Hono } from 'hono'
 import { PostgresArticleRepository } from '../internal/adapters/gateways/postgres-article-repository.js'
 import { ArticleUseCase } from '../internal/application/usecase/article-usecase.js'
 import { createArticleRouter } from '../internal/router/article-router.js'
+import { PostgresUserRepository } from '../internal/adapters/gateways/postgres-user-repository.js'
+import { UserUseCase } from '../internal/application/usecase/user-usecase.js'
+import { createUserRouter } from '../internal/router/user-router.js'
 
 const app = new Hono()
 
@@ -12,6 +15,10 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgres://postgres:password@l
 const articleRepository = new PostgresArticleRepository(DATABASE_URL)
 const articleUseCase = new ArticleUseCase(articleRepository)
 const articleRouter = createArticleRouter(articleUseCase)
+
+const userRepository = new PostgresUserRepository(DATABASE_URL)
+const userUseCase = new UserUseCase(userRepository)
+const userRouter = createUserRouter(userUseCase)
 
 const welcomeStrings = [
   'Hello Hono!',
@@ -24,5 +31,8 @@ app.get('/', (c) => {
 
 // Mount article routes
 app.route('/articles', articleRouter)
+
+// Mount user routes
+app.route('/users', userRouter)
 
 export default app
