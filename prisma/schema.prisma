@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  name      String
+  age       Int
+  mail      String   @unique
+  password  String
+  address   String?
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  isDeleted Boolean  @default(false) @map("is_deleted")
+
+  statusCard        UserStatusCard?
+  helpCard          UserHelpCard?
+  alertHistories    AlertHistory[]
+  schedules         UserSchedule[]
+  repeatSchedules   UserRepeatSchedule[]
+  emergencyContacts EmergencyContact[]
+  userAlertHistory  UserAlertHistory[]
+
+  @@map("user")
+}
+
+model Helper {
+  id           String @id @default(dbgenerated("gen_random_uuid()"))
+  name         String
+  nickname     String
+  phoneNumber  String @map("phone_number")
+  email        String @unique
+  relationship String
+
+  emergencyContacts  EmergencyContact[]
+  helperAlertHistory HelperAlertHistory[]
+
+  @@map("helper")
+}
+
+model EmergencyContact {
+  userId       String  @map("user_id")
+  helperId     String  @map("helper_id")
+  name         String
+  relationship String
+  phoneNumber  String  @map("phone_number")
+  isMain       Boolean @default(false) @map("is_main")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  helper Helper @relation(fields: [helperId], references: [id], onDelete: Cascade)
+
+  @@id([userId, helperId])
+  @@map("emergency_contact")
+}
+
+model UserStatusCard {
+  id        String  @id @default(dbgenerated("gen_random_uuid()"))
+  userId    String  @unique @map("user_id")
+  bloodType String? @map("blood_type")
+  allergy   String?
+  medicine  String?
+
+  user     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  diseases UserStatusCardDisease[]
+
+  @@map("user_status_card")
+}
+
+model UserStatusCardDisease {
+  id               String @id @default(dbgenerated("gen_random_uuid()"))
+  userStatusCardId String @map("user_status_card_id")
+  name             String
+
+  userStatusCard UserStatusCard @relation(fields: [userStatusCardId], references: [id], onDelete: Cascade)
+
+  @@map("user_status_card_disease")
+}
+
+model UserHelpCard {
+  id     String @id @default(dbgenerated("gen_random_uuid()"))
+  userId String @unique @map("user_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_help_card")
+}
+
+model UserSchedule {
+  id           String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId       String   @map("user_id")
+  title        String?
+  description  String?  @db.Text
+  scheduleType String   @map("schedule_type")
+  isRepeat     Boolean  @map("is_repeat")
+  startAt      DateTime @map("start_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_schedule")
+}
+
+model UserRepeatSchedule {
+  id           String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId       String   @map("user_id")
+  title        String
+  description  String
+  scheduleType String   @map("schedule_type")
+  interval     Int
+  scheduleTime DateTime @map("schedule_time") @db.Time
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_repeat_schedule")
+}
+
+model AlertHistory {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId      String   @map("user_id")
+  title       String
+  description String
+  importance  Int      @db.SmallInt
+  alertType   String   @map("alert_type")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAlertHistory   UserAlertHistory[]
+  helperAlertHistory HelperAlertHistory[]
+
+  @@map("alert_history")
+}
+
+model UserAlertHistory {
+  userId    String  @map("user_id")
+  alertId   String  @map("alert_id")
+  isChecked Boolean @default(false) @map("is_checked")
+
+  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alert AlertHistory @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@id([userId, alertId])
+  @@map("user_alert_history")
+}
+
+model HelperAlertHistory {
+  helperId  String  @map("helper_id")
+  alertId   String  @map("alert_id")
+  isChecked Boolean @default(false) @map("is_checked")
+
+  helper Helper       @relation(fields: [helperId], references: [id], onDelete: Cascade)
+  alert  AlertHistory @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@id([helperId, alertId])
+  @@map("helper_alert_history")
+}
+

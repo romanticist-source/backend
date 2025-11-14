@@ -1,16 +1,21 @@
-import { initDatabase } from '../internal/adapters/gateways/init-db.js'
+import { PrismaClient } from '@prisma/client'
 
-// Get database URL from environment variable
-const DATABASE_URL = process.env.DATABASE_URL || 'postgres://postgres:password@localhost:5432/romanticist'
+console.log('🚀 Initializing database with Prisma...')
 
-console.log('🚀 Initializing database...')
-console.log(`📍 Database URL: ${DATABASE_URL.replace(/:[^:@]+@/, ':***@')}`)
+const prisma = new PrismaClient()
 
 try {
-  await initDatabase(DATABASE_URL)
+  // Test database connection
+  await prisma.$connect()
+  console.log('✅ Database connection successful')
+  
+  // You can add seed data here if needed
   console.log('✨ Database initialization completed')
+  
+  await prisma.$disconnect()
   process.exit(0)
 } catch (error) {
   console.error('💥 Database initialization failed:', error)
+  await prisma.$disconnect()
   process.exit(1)
 }

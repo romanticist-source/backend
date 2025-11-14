@@ -1,6 +1,6 @@
 # Romanticist Backend
 
-Hexagonal Architecture (Clean Architecture) を採用した Hono + PostgreSQL のバックエンドAPI
+Hexagonal Architecture (Clean Architecture) を採用した Hono + PostgreSQL + Prisma のバックエンドAPI
 
 ## 🏗️ アーキテクチャ
 
@@ -9,7 +9,7 @@ internal/
 ├── domain/              # ドメイン層（エンティティ、ポート）
 ├── application/         # アプリケーション層（ユースケース）
 ├── adapters/           # アダプター層（実装）
-│   └── gateways/       # データアクセス実装
+│   └── gateways/       # データアクセス実装（Prisma）
 └── router/             # HTTPルーター
 ```
 
@@ -48,12 +48,16 @@ docker run --name postgres-romanticist \
   -d postgres:16
 ```
 
-### 4. データベースの初期化
+### 4. データベースのマイグレーション
 
-テーブルとインデックスを作成します。
+Prismaを使用してデータベーススキーマを作成します。
 
 ```bash
-pnpm db:init
+# マイグレーションを実行してテーブルを作成
+pnpm db:migrate
+
+# または初回セットアップ時
+pnpm db:setup
 ```
 
 ### 5. サーバーの起動
@@ -73,6 +77,76 @@ pnpm dev
 - `PUT /users/:id` - ユーザー情報を更新
 - `DELETE /users/:id` - ユーザーを完全削除（ハードデリート）
 - `POST /users/:id/soft-delete` - ユーザーを論理削除（ソフトデリート）
+
+### Helpers API
+
+- `GET /helpers` - すべてのヘルパーを取得
+- `GET /helpers/:id` - 特定のヘルパーを取得
+- `GET /helpers/email/:email` - メールアドレスでヘルパーを取得
+- `POST /helpers` - 新しいヘルパーを作成
+- `PUT /helpers/:id` - ヘルパー情報を更新
+- `DELETE /helpers/:id` - ヘルパーを削除
+
+### Emergency Contacts API
+
+- `GET /emergency-contacts` - すべての緊急連絡先を取得
+- `GET /emergency-contacts/user/:userId` - ユーザーの緊急連絡先を取得
+- `GET /emergency-contacts/helper/:helperId` - ヘルパーの緊急連絡先を取得
+- `GET /emergency-contacts/:userId/:helperId` - 特定の緊急連絡先を取得
+- `POST /emergency-contacts` - 新しい緊急連絡先を作成
+- `PUT /emergency-contacts/:userId/:helperId` - 緊急連絡先を更新
+- `DELETE /emergency-contacts/:userId/:helperId` - 緊急連絡先を削除
+
+### User Status Cards API
+
+- `GET /user-status-cards/status-cards` - すべてのステータスカードを取得
+- `GET /user-status-cards/status-cards/:id` - 特定のステータスカードを取得
+- `GET /user-status-cards/status-cards/user/:userId` - ユーザーのステータスカードを取得
+- `POST /user-status-cards/status-cards` - 新しいステータスカードを作成
+- `PUT /user-status-cards/status-cards/:id` - ステータスカードを更新
+- `DELETE /user-status-cards/status-cards/:id` - ステータスカードを削除
+- `GET /user-status-cards/diseases` - すべての病名を取得
+- `GET /user-status-cards/diseases/:id` - 特定の病名を取得
+- `GET /user-status-cards/diseases/status-card/:statusCardId` - ステータスカードの病名を取得
+- `POST /user-status-cards/diseases` - 新しい病名を作成
+- `PUT /user-status-cards/diseases/:id` - 病名を更新
+- `DELETE /user-status-cards/diseases/:id` - 病名を削除
+
+### User Schedules API
+
+- `GET /user-schedules/schedules` - すべてのスケジュールを取得
+- `GET /user-schedules/schedules/:id` - 特定のスケジュールを取得
+- `GET /user-schedules/schedules/user/:userId` - ユーザーのスケジュールを取得
+- `POST /user-schedules/schedules` - 新しいスケジュールを作成
+- `PUT /user-schedules/schedules/:id` - スケジュールを更新
+- `DELETE /user-schedules/schedules/:id` - スケジュールを削除
+- `GET /user-schedules/repeat-schedules` - すべての繰り返しスケジュールを取得
+- `GET /user-schedules/repeat-schedules/:id` - 特定の繰り返しスケジュールを取得
+- `GET /user-schedules/repeat-schedules/user/:userId` - ユーザーの繰り返しスケジュールを取得
+- `POST /user-schedules/repeat-schedules` - 新しい繰り返しスケジュールを作成
+- `PUT /user-schedules/repeat-schedules/:id` - 繰り返しスケジュールを更新
+- `DELETE /user-schedules/repeat-schedules/:id` - 繰り返しスケジュールを削除
+
+### Alerts API
+
+- `GET /alerts` - すべてのアラートを取得
+- `GET /alerts/:id` - 特定のアラートを取得
+- `GET /alerts/user/:userId` - ユーザーのアラートを取得
+- `POST /alerts` - 新しいアラートを作成
+- `PUT /alerts/:id` - アラートを更新
+- `DELETE /alerts/:id` - アラートを削除
+- `GET /alerts/user-history/:userId` - ユーザーのアラート履歴を取得
+- `POST /alerts/:alertHistoryId/check-by-user/:userId` - ユーザーがアラートを確認済みにする
+- `GET /alerts/helper-history/:helperId` - ヘルパーのアラート履歴を取得
+- `POST /alerts/:alertHistoryId/check-by-helper/:helperId` - ヘルパーがアラートを確認済みにする
+
+### User Help Cards API
+
+- `GET /user-help-cards` - すべてのヘルプカードを取得
+- `GET /user-help-cards/:id` - 特定のヘルプカードを取得
+- `GET /user-help-cards/user/:userId` - ユーザーのヘルプカードを取得
+- `POST /user-help-cards` - 新しいヘルプカードを作成
+- `DELETE /user-help-cards/:id` - ヘルプカードを削除
 
 ### リクエスト例
 
@@ -132,44 +206,26 @@ curl -X POST http://localhost:3000/users/{user-id}/soft-delete
 curl -X DELETE http://localhost:3000/users/{user-id}
 ```
 
-#### 記事の作成
-
-```bash
-curl -X POST http://localhost:3000/articles \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Hello World",
-    "content": "This is my first article",
-    "authorId": "user-123"
-  }'
-```
-
-#### 記事の一覧取得
-```bash
-curl http://localhost:3000/articles
-```
-
-#### 記事の取得
-```bash
-curl http://localhost:3000/articles/1
-```
-
-#### 記事の更新
-```bash
-curl -X PUT http://localhost:3000/articles/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Updated Title",
-    "content": "Updated content"
-  }'
-```
-
-#### 記事の削除
-```bash
-curl -X DELETE http://localhost:3000/articles/1
-```
-
 ## 🔧 開発
+
+### Prisma コマンド
+
+```bash
+# スキーマを編集後、マイグレーションを作成
+pnpm db:migrate
+
+# 本番環境へのマイグレーション適用
+pnpm db:migrate:deploy
+
+# Prisma Clientの再生成
+pnpm db:generate
+
+# Prisma Studio（GUIツール）を起動
+pnpm db:studio
+
+# データベースのリセット（全データ削除）
+pnpm db:reset
+```
 
 ### データベースのリセット
 
@@ -185,19 +241,14 @@ docker run --name postgres-romanticist \
   -p 5432:5432 \
   -d postgres:16
 
-pnpm db:init
+pnpm db:migrate
 ```
 
 ## 📦 技術スタック
 
 - **Hono** - 高速な Web フレームワーク
 - **PostgreSQL** - リレーショナルデータベース
-- **postgres.js** - PostgreSQL クライアント
+- **Prisma** - 次世代 TypeScript ORM
 - **TypeScript** - 型安全な開発
 
-## 🎯 Hexagonal Architecture の利点
-
-1. **依存性の逆転**: ドメイン層が外部の実装に依存しない
-2. **テスタビリティ**: インターフェースを通じて簡単にモックやスタブを作成可能
-3. **拡張性**: 新しいアダプターを追加することで、異なるデータソースやUIに対応可能
-4. **保守性**: ビジネスロジックとインフラストラクチャが分離されている
+## Hexagonal Architecture
