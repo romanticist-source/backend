@@ -64,6 +64,16 @@ pnpm dev
 
 ## 📚 API エンドポイント
 
+### Users API
+
+- `GET /users` - すべてのユーザーを取得（クエリパラメータ: `includeDeleted=true` で削除済みユーザーも含む）
+- `GET /users/:id` - 特定のユーザーを取得
+- `GET /users/mail/:mail` - メールアドレスでユーザーを取得
+- `POST /users` - 新しいユーザーを作成
+- `PUT /users/:id` - ユーザー情報を更新
+- `DELETE /users/:id` - ユーザーを完全削除（ハードデリート）
+- `POST /users/:id/soft-delete` - ユーザーを論理削除（ソフトデリート）
+
 ### Articles API
 
 - `GET /articles` - すべての記事を取得
@@ -74,7 +84,64 @@ pnpm dev
 
 ### リクエスト例
 
+#### ユーザーの作成
+
+```bash
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "山田太郎",
+    "age": 30,
+    "mail": "yamada@example.com",
+    "password": "securepassword123",
+    "address": "東京都渋谷区",
+    "comment": "よろしくお願いします"
+  }'
+```
+
+#### ユーザーの一覧取得
+
+```bash
+curl http://localhost:3000/users
+```
+
+#### ユーザーの取得
+
+```bash
+curl http://localhost:3000/users/{user-id}
+```
+
+#### メールアドレスでユーザーを検索
+
+```bash
+curl http://localhost:3000/users/mail/yamada@example.com
+```
+
+#### ユーザー情報の更新
+
+```bash
+curl -X PUT http://localhost:3000/users/{user-id} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "山田花子",
+    "age": 31
+  }'
+```
+
+#### ユーザーの論理削除
+
+```bash
+curl -X POST http://localhost:3000/users/{user-id}/soft-delete
+```
+
+#### ユーザーの完全削除
+
+```bash
+curl -X DELETE http://localhost:3000/users/{user-id}
+```
+
 #### 記事の作成
+
 ```bash
 curl -X POST http://localhost:3000/articles \
   -H "Content-Type: application/json" \
