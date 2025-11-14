@@ -74,14 +74,6 @@ pnpm dev
 - `DELETE /users/:id` - ユーザーを完全削除（ハードデリート）
 - `POST /users/:id/soft-delete` - ユーザーを論理削除（ソフトデリート）
 
-### Articles API
-
-- `GET /articles` - すべての記事を取得
-- `GET /articles/:id` - 特定の記事を取得
-- `POST /articles` - 新しい記事を作成
-- `PUT /articles/:id` - 記事を更新
-- `DELETE /articles/:id` - 記事を削除
-
 ### リクエスト例
 
 #### ユーザーの作成
