@@ -9,12 +9,17 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "docs": "echo 'Open http://localhost:3000/ui in your browser'"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.6",
+    "@hono/swagger-ui": "^0.5.2",
+    "@hono/zod-openapi": "^1.1.4",
     "@prisma/client": "^6.19.0",
     "dotenv": "^17.2.3",
-    "hono": "^4.10.2"
+    "hono": "^4.10.2",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
