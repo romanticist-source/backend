@@ -2,6 +2,15 @@
 
 Hexagonal Architecture (Clean Architecture) を採用した Hono + PostgreSQL + Prisma のバックエンドAPI
 
+## 📖 API ドキュメント (Swagger)
+
+サーバーを起動後、以下のURLでSwagger UIを確認できます:
+
+- **Swagger UI**: http://localhost:3000/ui
+- **OpenAPI JSON**: http://localhost:3000/doc
+
+Swagger UIでは、各エンドポイントの詳細な仕様を確認でき、直接APIをテストすることができます。
+
 ## 🏗️ アーキテクチャ
 
 ```
