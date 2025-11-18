@@ -1,5 +1,7 @@
-import { Hono } from 'hono'
+import { OpenAPIHono } from '@hono/zod-openapi'
+import { swaggerUI } from '@hono/swagger-ui'
 import { PrismaClient } from '@prisma/client'
+import { serve } from '@hono/node-server'
 
 import { PrismaUserRepository } from '../internal/adapters/gateways/prisma-user-repository.js'
 import { PrismaHelperRepository } from '../internal/adapters/gateways/prisma-helper-repository.js'
@@ -17,15 +19,15 @@ import { UserScheduleUseCase } from '../internal/application/usecase/user-schedu
 import { AlertHistoryUseCase } from '../internal/application/usecase/alert-history-usecase.js'
 import { UserHelpCardUseCase } from '../internal/application/usecase/user-help-card-usecase.js'
 
-import { createUserRouter } from '../internal/router/user-router.js'
-import { createHelperRouter } from '../internal/router/helper-router.js'
-import { createEmergencyContactRouter } from '../internal/router/emergency-contact-router.js'
-import { createUserStatusCardRouter } from '../internal/router/user-status-card-router.js'
-import { createUserScheduleRouter } from '../internal/router/user-schedule-router.js'
-import { createAlertHistoryRouter } from '../internal/router/alert-history-router.js'
-import { createUserHelpCardRouter } from '../internal/router/user-help-card-router.js'
+import { createUserRouter } from '../internal/router/user-router-openapi.js'
+import { createHelperRouter } from '../internal/router/helper-router-openapi.js'
+import { createEmergencyContactRouter } from '../internal/router/emergency-contact-router-openapi.js'
+import { createUserStatusCardRouter } from '../internal/router/user-status-card-router-openapi.js'
+import { createUserScheduleRouter } from '../internal/router/user-schedule-router-openapi.js'
+import { createAlertHistoryRouter } from '../internal/router/alert-history-router-openapi.js'
+import { createUserHelpCardRouter } from '../internal/router/user-help-card-router-openapi.js'
 
-const app = new Hono()
+const app = new OpenAPIHono()
 
 // Initialize Prisma Client
 const prisma = new PrismaClient()
@@ -86,4 +88,36 @@ app.route('/user-schedules', userScheduleRouter)
 app.route('/alerts', alertHistoryRouter)
 app.route('/user-help-cards', userHelpCardRouter)
 
+// OpenAPI JSON endpoint
+app.doc('/doc', {
+  openapi: '3.0.0',
+  info: {
+    version: '1.0.0',
+    title: 'HAL Backend API',
+    description: 'HAL システムのバックエンドAPI'
+  },
+  servers: [
+    {
+      url: 'http://localhost:3000',
+      description: '開発環境'
+    }
+  ]
+})
+
+// Swagger UI endpoint
+app.get('/ui', swaggerUI({ url: '/doc' }))
+
+// Start the server
+const port = Number(process.env.PORT) || 3000
+
+const server = serve({
+  fetch: app.fetch,
+  port
+})
+
+console.log(`🚀 Server is running on http://localhost:${port}`)
+console.log(`📚 Swagger UI: http://localhost:${port}/ui`)
+console.log(`📄 OpenAPI JSON: http://localhost:${port}/doc`)
+
 export default app
+
