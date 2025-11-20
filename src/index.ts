@@ -1,5 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { swaggerUI } from '@hono/swagger-ui'
+import { cors } from 'hono/cors'
 import { PrismaClient } from '@prisma/client'
 import { serve } from '@hono/node-server'
 
@@ -28,6 +29,13 @@ import { createAlertHistoryRouter } from '../internal/router/alert-history-route
 import { createUserHelpCardRouter } from '../internal/router/user-help-card-router-openapi.js'
 
 const app = new OpenAPIHono()
+
+// CORS middleware
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+}))
 
 // Initialize Prisma Client
 const prisma = new PrismaClient()
@@ -79,14 +87,14 @@ app.get('/', (c) => {
   return c.text(welcomeStrings.join('\n\n'))
 })
 
-// Mount routes
-app.route('/users', userRouter)
-app.route('/helpers', helperRouter)
-app.route('/emergency-contacts', emergencyContactRouter)
-app.route('/user-status-cards', userStatusCardRouter)
-app.route('/user-schedules', userScheduleRouter)
-app.route('/alerts', alertHistoryRouter)
-app.route('/user-help-cards', userHelpCardRouter)
+// Mount routes with /api prefix
+app.route('/api/users', userRouter)
+app.route('/api/helpers', helperRouter)
+app.route('/api/emergency-contacts', emergencyContactRouter)
+app.route('/api/user-status-cards', userStatusCardRouter)
+app.route('/api/user-schedules', userScheduleRouter)
+app.route('/api/alerts', alertHistoryRouter)
+app.route('/api/user-help-cards', userHelpCardRouter)
 
 // OpenAPI JSON endpoint
 app.doc('/doc', {
