@@ -30,16 +30,23 @@ export class PrismaUserScheduleRepository implements UserScheduleRepository {
   }
 
   async create(input: CreateUserScheduleInput): Promise<UserSchedule> {
+    const startAt = input.startAt instanceof Date ? input.startAt : new Date(String(input.startAt))
     return await this.prisma.userSchedule.create({
-      data: input,
+      data: {
+        ...input,
+        startAt,
+      },
     })
   }
 
   async update(id: string, input: UpdateUserScheduleInput): Promise<UserSchedule | null> {
     try {
+      const data = input.startAt
+        ? { ...input, startAt: input.startAt instanceof Date ? input.startAt : new Date(String(input.startAt)) }
+        : input
       return await this.prisma.userSchedule.update({
         where: { id },
-        data: input,
+        data,
       })
     } catch {
       return null
