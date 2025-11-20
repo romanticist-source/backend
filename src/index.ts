@@ -88,13 +88,13 @@ app.get('/', (c) => {
 })
 
 // Mount routes with /api prefix
-app.route('/api/users', userRouter)
-app.route('/api/helpers', helperRouter)
-app.route('/api/emergency-contacts', emergencyContactRouter)
-app.route('/api/user-status-cards', userStatusCardRouter)
-app.route('/api/user-schedules', userScheduleRouter)
-app.route('/api/alerts', alertHistoryRouter)
-app.route('/api/user-help-cards', userHelpCardRouter)
+app.route('/users', userRouter)
+app.route('/helpers', helperRouter)
+app.route('/emergency-contacts', emergencyContactRouter)
+app.route('/user-status-cards', userStatusCardRouter)
+app.route('/user-schedules', userScheduleRouter)
+app.route('/alerts', alertHistoryRouter)
+app.route('/user-help-cards', userHelpCardRouter)
 
 // OpenAPI JSON endpoint
 app.doc('/doc', {
