@@ -40,7 +40,12 @@ cp .env.example .env
 
 `.env` ファイル:
 ```env
-DATABASE_URL=postgres://username:password@localhost:5432/database_name
+DATABASE_NAME=romanticist
+DATABASE_PORT=5444
+DATABASE_HOST=localhost
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_URL=postgres://username:password@localhost:5444/database_name
 PORT=3000
 ```
 
@@ -233,6 +238,31 @@ pnpm db:generate
 pnpm db:studio
 
 # データベースのリセット（全データ削除）
+pnpm db:reset
+
+# シードデータの投入
+pnpm db:seed
+```
+
+### シードデータ
+
+`prisma/seed.ts` にサンプルデータが定義されています。以下のデータが作成されます：
+
+- **ユーザー**: 3名（山田太郎、佐藤花子、鈴木一郎）
+- **ヘルパー**: 3名
+- **緊急連絡先**: 3件
+- **ステータスカード**: 3件（血液型、アレルギー、服薬情報）
+- **病歴**: 5件
+- **ヘルプカード**: 2件
+- **スケジュール**: 4件
+- **繰り返しスケジュール**: 5件（服薬リマインダー）
+- **アラート履歴**: 4件
+
+```bash
+# シードを実行
+pnpm db:seed
+
+# または db:reset を実行すると自動的にシードも実行される
 pnpm db:reset
 ```
 
