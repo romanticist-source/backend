@@ -14,26 +14,26 @@ try {
 
   const users = [
     {
+      id: 'user-001',
       name: '佐藤 一郎',
       age: 75,
       mail: 'ichiro.sato@example.com',
-      password: 'password123',
       address: '東京都新宿区西新宿1-1-1',
       comment: '心臓病の既往歴あり。毎日の服薬管理が必要。',
     },
     {
+      id: 'user-002',
       name: '田中 幸子',
       age: 82,
       mail: 'sachiko.tanaka@example.com',
-      password: 'password123',
       address: '東京都渋谷区渋谷2-2-2',
       comment: '認知症の初期症状あり。見守りが必要。',
     },
     {
+      id: 'user-003',
       name: '山本 健太',
       age: 68,
       mail: 'kenta.yamamoto@example.com',
-      password: 'password123',
       address: '東京都品川区大崎3-3-3',
       comment: '糖尿病。食事管理と運動が重要。',
     },
@@ -41,9 +41,10 @@ try {
 
   const createdUsers = []
   for (const user of users) {
+    const { id, ...userData } = user
     const created = await prisma.user.upsert({
-      where: { mail: user.mail },
-      update: user,
+      where: { id: user.id },
+      update: userData,
       create: user,
     })
     createdUsers.push(created)
