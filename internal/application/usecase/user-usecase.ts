@@ -43,18 +43,6 @@ export class UserUseCase {
       throw new Error('User with this email already exists')
     }
 
-    if (!input.password || input.password.trim() === '') {
-      throw new Error('Password is required')
-    }
-
-    if (input.password.length < 8) {
-      throw new Error('Password must be at least 8 characters long')
-    }
-
-    if (input.age < 0 || input.age > 150) {
-      throw new Error('Invalid age')
-    }
-
     return await this.userRepository.create(input)
   }
 
@@ -81,14 +69,6 @@ export class UserUseCase {
       if (userWithSameMail && userWithSameMail.id !== id) {
         throw new Error('Another user with this email already exists')
       }
-    }
-
-    if (input.password !== undefined && input.password.length < 8) {
-      throw new Error('Password must be at least 8 characters long')
-    }
-
-    if (input.age !== undefined && (input.age < 0 || input.age > 150)) {
-      throw new Error('Invalid age')
     }
 
     return await this.userRepository.update(id, input)
@@ -119,4 +99,13 @@ export class UserUseCase {
     // Soft delete
     return await this.userRepository.softDelete(id)
   }
+
+  async upsertGoogleUser(input: CreateUserInput): Promise<User> {
+    if (!input || !input.id || !input.mail || !input.name) {
+      throw new Error('Invalid Google payload')
+    }
+
+    return await this.userRepository.upsertGoogle(input)
+  }
+
 }
