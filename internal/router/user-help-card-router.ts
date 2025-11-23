@@ -54,15 +54,31 @@ export function createUserHelpCardRouter(useCase: UserHelpCardUseCase) {
     }
   })
 
+  router.put('/:id', async (c) => {
+    try {
+      const id = c.req.param('id')
+      const body = await c.req.json()
+      const card = await useCase.updateHelpCard(id, body)
+
+      if (!card) {
+        return c.json({ error: 'Help card not found' }, 404)
+      }
+
+      return c.json(card)
+    } catch (error) {
+      return c.json({ error: 'Failed to update help card' }, 500)
+    }
+  })
+
   router.delete('/:id', async (c) => {
     try {
       const id = c.req.param('id')
       const success = await useCase.deleteHelpCard(id)
-      
+
       if (!success) {
         return c.json({ error: 'Help card not found' }, 404)
       }
-      
+
       return c.json({ message: 'Help card deleted successfully' })
     } catch (error) {
       return c.json({ error: 'Failed to delete help card' }, 500)

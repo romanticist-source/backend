@@ -1,6 +1,7 @@
 import type {
   UserHelpCardRepository,
   CreateUserHelpCardInput,
+  UpdateUserHelpCardInput,
   UserHelpCard,
 } from '../../domain/user-help-card.js'
 
@@ -30,6 +31,10 @@ export class UserHelpCardUseCase {
     }
 
     return this.repository.create(input)
+  }
+
+  async updateHelpCard(id: string, input: UpdateUserHelpCardInput): Promise<UserHelpCard | null> {
+    return this.repository.update(id, input)
   }
 
   async deleteHelpCard(id: string): Promise<boolean> {

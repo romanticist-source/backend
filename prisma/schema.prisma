@@ -63,11 +63,15 @@ model EmergencyContact {
 }
 
 model UserStatusCard {
-  id        String  @id @default(dbgenerated("gen_random_uuid()"))
-  userId    String  @unique @map("user_id")
-  bloodType String? @map("blood_type")
-  allergy   String?
-  medicine  String?
+  id         String  @id @default(dbgenerated("gen_random_uuid()"))
+  userId     String  @unique @map("user_id")
+  bloodType  String? @map("blood_type")
+  allergy    String?
+  medicine   String?
+  height     String?
+  weight     String?
+  disability String?
+  notes      String?
 
   user     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   diseases UserStatusCardDisease[]
@@ -86,8 +90,10 @@ model UserStatusCardDisease {
 }
 
 model UserHelpCard {
-  id     String @id @default(dbgenerated("gen_random_uuid()"))
-  userId String @unique @map("user_id")
+  id            String  @id @default(dbgenerated("gen_random_uuid()"))
+  userId        String  @unique @map("user_id")
+  hospitalName  String? @map("hospital_name")
+  hospitalPhone String? @map("hospital_phone")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -3,6 +3,7 @@ import type {
   UserHelpCard,
   UserHelpCardRepository,
   CreateUserHelpCardInput,
+  UpdateUserHelpCardInput,
 } from '../../domain/user-help-card.js'
 
 export class PrismaUserHelpCardRepository implements UserHelpCardRepository {
@@ -28,6 +29,17 @@ export class PrismaUserHelpCardRepository implements UserHelpCardRepository {
     return await this.prisma.userHelpCard.create({
       data: input,
     })
+  }
+
+  async update(id: string, input: UpdateUserHelpCardInput): Promise<UserHelpCard | null> {
+    try {
+      return await this.prisma.userHelpCard.update({
+        where: { id },
+        data: input,
+      })
+    } catch {
+      return null
+    }
   }
 
   async delete(id: string): Promise<boolean> {
