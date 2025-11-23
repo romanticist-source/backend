@@ -213,6 +213,7 @@ export async function seed(prisma: PrismaClient) {
       name: '山田 太郎',
       relationship: '長男',
       phoneNumber: '090-1234-5678',
+      address: '東京都世田谷区三軒茶屋1-1-1',
       isMain: true,
     },
     {
@@ -221,6 +222,7 @@ export async function seed(prisma: PrismaClient) {
       name: '佐藤 美咲',
       relationship: 'ケアマネージャー',
       phoneNumber: '080-4567-8901',
+      address: '東京都新宿区高田馬場2-2-2',
       isMain: false,
     },
     {
@@ -229,6 +231,7 @@ export async function seed(prisma: PrismaClient) {
       name: '山田 花子',
       relationship: '長女',
       phoneNumber: '080-2345-6789',
+      address: '東京都目黒区中目黒3-3-3',
       isMain: true,
     },
     {
@@ -237,6 +240,7 @@ export async function seed(prisma: PrismaClient) {
       name: '高橋 恵子',
       relationship: '訪問看護師',
       phoneNumber: '080-6789-0123',
+      address: '東京都港区六本木4-4-4',
       isMain: false,
     },
     {
@@ -245,6 +249,7 @@ export async function seed(prisma: PrismaClient) {
       name: '田中 次郎',
       relationship: 'ヘルパー',
       phoneNumber: '070-3456-7890',
+      address: '東京都品川区五反田5-5-5',
       isMain: true,
     },
   ]
