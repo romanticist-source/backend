@@ -117,21 +117,33 @@ try {
   const statusCards = [
     {
       userId: createdUsers[0].id,
-      bloodType: '型',
+      bloodType: 'A型',
       allergy: '卵、牛乳',
       medicine: 'アスピリン、降圧剤',
+      height: '165',
+      weight: '62',
+      disability: '軽度の難聴',
+      notes: '大きな声で話しかけてください。左耳が聞こえにくいです。',
     },
     {
       userId: createdUsers[1].id,
       bloodType: 'O型',
       allergy: 'なし',
       medicine: '認知症治療薬',
+      height: '152',
+      weight: '48',
+      disability: '軽度認知障害',
+      notes: '急な環境変化に不安を感じやすいです。ゆっくり説明してください。',
     },
     {
       userId: createdUsers[2].id,
       bloodType: 'B型',
       allergy: '卵、牛乳',
       medicine: 'インスリン、メトホルミン',
+      height: '170',
+      weight: '75',
+      disability: '視力低下（糖尿病性網膜症）',
+      notes: '低血糖に注意。ブドウ糖を常に携帯しています。',
     },
   ]
 
@@ -170,15 +182,33 @@ try {
   // Seed UserHelpCards (ヘルプカード)
   console.log('📝 Seeding user help cards...')
 
-  for (const user of createdUsers) {
+  const helpCards = [
+    {
+      userId: createdUsers[0].id,
+      hospitalName: '新宿中央病院',
+      hospitalPhone: '03-1234-5678',
+    },
+    {
+      userId: createdUsers[1].id,
+      hospitalName: '渋谷メモリークリニック',
+      hospitalPhone: '03-2345-6789',
+    },
+    {
+      userId: createdUsers[2].id,
+      hospitalName: '品川糖尿病センター',
+      hospitalPhone: '03-3456-7890',
+    },
+  ]
+
+  for (const helpCard of helpCards) {
     await prisma.userHelpCard.upsert({
-      where: { userId: user.id },
-      update: { userId: user.id },
-      create: { userId: user.id },
+      where: { userId: helpCard.userId },
+      update: helpCard,
+      create: helpCard,
     })
   }
 
-  console.log(`✅ Seeded ${createdUsers.length} user help cards`)
+  console.log(`✅ Seeded ${helpCards.length} user help cards`)
 
   // Seed EmergencyContacts (緊急連絡先)
   console.log('📝 Seeding emergency contacts...')
