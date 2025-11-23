@@ -2,9 +2,9 @@
 export interface User {
   id: string
   name: string
-  age: number
+  age?: number
   mail: string
-  password: string
+  icon: string
   address?: string | null
   comment?: string | null
   createdAt: Date
@@ -12,7 +12,7 @@ export interface User {
   isDeleted: boolean
 }
 
-export type CreateUserInput = Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'isDeleted'>
+export type CreateUserInput = Omit<User, 'createdAt' | 'updatedAt' | 'isDeleted'>
 export type UpdateUserInput = Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'isDeleted'>>
 
 // Domain Repository Interface (Port)
@@ -24,4 +24,5 @@ export interface UserRepository {
   update(id: string, input: UpdateUserInput): Promise<User | null>
   delete(id: string): Promise<boolean>
   softDelete(id: string): Promise<boolean>
+  upsertGoogle(input: CreateUserInput): Promise<User>
 }

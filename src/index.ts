@@ -3,6 +3,7 @@ import { swaggerUI } from '@hono/swagger-ui'
 import { cors } from 'hono/cors'
 import { PrismaClient } from '@prisma/client'
 import { serve } from '@hono/node-server'
+import { Cookie } from "hono/utils/cookie";
 
 import { PrismaUserRepository } from '../internal/adapters/gateways/prisma-user-repository.js'
 import { PrismaHelperRepository } from '../internal/adapters/gateways/prisma-helper-repository.js'
@@ -29,12 +30,13 @@ import { createAlertHistoryRouter } from '../internal/router/alert-history-route
 import { createUserHelpCardRouter } from '../internal/router/user-help-card-router-openapi.js'
 
 const app = new OpenAPIHono()
-
+const allowedOrigin = "http://localhost:8081";
 // CORS middleware
 app.use('*', cors({
-  origin: '*',
+  origin: allowedOrigin,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }))
 
 // Initialize Prisma Client
@@ -117,7 +119,6 @@ app.get('/ui', swaggerUI({ url: '/doc' }))
 
 // Start the server
 const port = Number(process.env.PORT) || 3000
-
 const server = serve({
   fetch: app.fetch,
   port

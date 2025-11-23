@@ -1,10 +1,10 @@
-import { PrismaClient } from '@prisma/client'
-import type { 
-  User, 
-  UserRepository, 
-  CreateUserInput, 
-  UpdateUserInput 
-} from '../../domain/user.js'
+import { PrismaClient } from "@prisma/client";
+import type {
+  User,
+  UserRepository,
+  CreateUserInput,
+  UpdateUserInput,
+} from "../../domain/user.js";
 
 export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -12,27 +12,27 @@ export class PrismaUserRepository implements UserRepository {
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-    })
-    return user
+    });
+    return user;
   }
 
   async findAll(includeDeleted = false): Promise<User[]> {
     return await this.prisma.user.findMany({
       where: includeDeleted ? {} : { isDeleted: false },
-    })
+    });
   }
 
   async findByMail(mail: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { mail },
-    })
-    return user
+    });
+    return user;
   }
 
   async create(input: CreateUserInput): Promise<User> {
     return await this.prisma.user.create({
       data: input,
-    })
+    });
   }
 
   async update(id: string, input: UpdateUserInput): Promise<User | null> {
@@ -40,9 +40,9 @@ export class PrismaUserRepository implements UserRepository {
       return await this.prisma.user.update({
         where: { id },
         data: input,
-      })
+      });
     } catch {
-      return null
+      return null;
     }
   }
 
@@ -50,10 +50,10 @@ export class PrismaUserRepository implements UserRepository {
     try {
       await this.prisma.user.delete({
         where: { id },
-      })
-      return true
+      });
+      return true;
     } catch {
-      return false
+      return false;
     }
   }
 
@@ -62,10 +62,36 @@ export class PrismaUserRepository implements UserRepository {
       await this.prisma.user.update({
         where: { id },
         data: { isDeleted: true },
-      })
-      return true
+      });
+      return true;
     } catch {
-      return false
+      return false;
     }
+  }
+
+  async upsertGoogle(input: CreateUserInput): Promise<User> {
+    if (!input.id || !input.mail || !input.name) {
+      throw new Error("Invalid Google payload");
+    }
+
+    return await this.prisma.user.upsert({
+      where: { id: input.id },
+      update: {
+        name: input.name,
+        mail: input.mail,
+        icon: input.icon,
+        address: input.address,
+        comment: input.comment,
+        isDeleted: false, // ログイン時に復活させたい場合
+      },
+      create: {
+        id: input.id,
+        name: input.name,
+        mail: input.mail,
+        icon: input.icon,
+        address: input.address,
+        comment: input.comment,
+      },
+    });
   }
 }
