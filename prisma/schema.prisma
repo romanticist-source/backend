@@ -53,6 +53,7 @@ model EmergencyContact {
   name         String
   relationship String
   phoneNumber  String  @map("phone_number")
+  email        String?
   address      String?
   isMain       Boolean @default(false) @map("is_main")
 
