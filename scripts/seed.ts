@@ -206,13 +206,22 @@ export async function seed(prisma: PrismaClient) {
   console.log('📝 Seeding user status card diseases...')
 
   const diseases = [
-    { userStatusCardId: createdStatusCards[0].id, name: '高血圧' },
-    { userStatusCardId: createdStatusCards[0].id, name: '狭心症' },
+    // User 1 (Heart)
+    { userStatusCardId: createdStatusCards[0].id, name: '高血圧症' },
+    { userStatusCardId: createdStatusCards[0].id, name: '労作性狭心症' },
+    // User 2 (Dementia)
     { userStatusCardId: createdStatusCards[1].id, name: 'アルツハイマー型認知症' },
-    { userStatusCardId: createdStatusCards[1].id, name: '骨粗しょう症' },
+    { userStatusCardId: createdStatusCards[1].id, name: '骨粗鬆症' },
+    // User 3 (Diabetes)
     { userStatusCardId: createdStatusCards[2].id, name: '2型糖尿病' },
-    { userStatusCardId: createdStatusCards[2].id, name: '高脂血症' },
+    { userStatusCardId: createdStatusCards[2].id, name: '脂質異常症' },
+    { userStatusCardId: createdStatusCards[2].id, name: '糖尿病性網膜症' },
+    // User 4 (Healthy/Preventive)
+    { userStatusCardId: createdStatusCards[3].id, name: '花粉症' },
+    { userStatusCardId: createdStatusCards[3].id, name: '変形性膝関節症' },
+    // User 5 (Rehab)
     { userStatusCardId: createdStatusCards[4].id, name: '右脛骨骨折' },
+    { userStatusCardId: createdStatusCards[4].id, name: '外傷性頸部症候群' },
   ]
 
   for (const disease of diseases) {
