@@ -29,6 +29,22 @@ export async function seed(prisma: PrismaClient) {
       address: '東京都品川区大崎3-3-3',
       comment: '糖尿病。食事管理と運動が重要。',
     },
+    {
+      id: 'user-004',
+      name: '鈴木 博',
+      age: 70,
+      mail: 'hiroshi.suzuki@example.com',
+      address: '東京都豊島区池袋4-4-4',
+      comment: '健康維持のための予防医療に関心あり。',
+    },
+    {
+      id: 'user-005',
+      name: '高橋 由美',
+      age: 45,
+      mail: 'yumi.takahashi@example.com',
+      address: '東京都港区赤坂5-5-5',
+      comment: '事故によるリハビリ中。一時的な介助が必要。',
+    },
   ]
 
   const createdUsers = []
@@ -90,6 +106,20 @@ export async function seed(prisma: PrismaClient) {
       email: 'keiko.takahashi@care-service.com',
       relationship: '訪問看護師',
     },
+    {
+      name: '中村 医師',
+      nickname: '中村先生',
+      phoneNumber: '03-1111-2222',
+      email: 'nakamura@hospital.com',
+      relationship: '主治医',
+    },
+    {
+      name: 'ボランティア 田中',
+      nickname: 'ボラさん',
+      phoneNumber: '090-9999-8888',
+      email: 'volunteer.tanaka@npo.org',
+      relationship: 'ボランティア',
+    },
   ]
 
   const createdHelpers = []
@@ -111,32 +141,52 @@ export async function seed(prisma: PrismaClient) {
     {
       userId: createdUsers[0].id,
       bloodType: 'A型',
-      allergy: '卵、牛乳',
-      medicine: 'アスピリン、降圧剤',
+      allergy: JSON.stringify(['卵', '牛乳']),
+      medicine: JSON.stringify([{ name: 'アスピリン' }, { name: '降圧剤' }]),
       height: '165',
       weight: '62',
       disability: '軽度の難聴',
-      notes: '大きな声で話しかけてください。左耳が聞こえにくいです。',
+      notes: JSON.stringify({ otherNotes: '大きな声で話しかけてください。左耳が聞こえにくいです。' }),
     },
     {
       userId: createdUsers[1].id,
       bloodType: 'O型',
-      allergy: 'なし',
-      medicine: '認知症治療薬',
+      allergy: JSON.stringify([]),
+      medicine: JSON.stringify([{ name: '認知症治療薬' }]),
       height: '152',
       weight: '48',
       disability: '軽度認知障害',
-      notes: '急な環境変化に不安を感じやすいです。ゆっくり説明してください。',
+      notes: JSON.stringify({ otherNotes: '急な環境変化に不安を感じやすいです。ゆっくり説明してください。' }),
     },
     {
       userId: createdUsers[2].id,
       bloodType: 'B型',
-      allergy: '卵、牛乳',
-      medicine: 'インスリン、メトホルミン',
+      allergy: JSON.stringify(['そば', 'ピーナッツ']),
+      medicine: JSON.stringify([{ name: 'インスリン' }, { name: 'メトホルミン' }]),
       height: '170',
       weight: '75',
       disability: '視力低下（糖尿病性網膜症）',
-      notes: '低血糖に注意。ブドウ糖を常に携帯しています。',
+      notes: JSON.stringify({ otherNotes: '低血糖に注意。ブドウ糖を常に携帯しています。' }),
+    },
+    {
+      userId: createdUsers[3].id,
+      bloodType: 'AB型',
+      allergy: JSON.stringify([]),
+      medicine: JSON.stringify([{ name: 'ビタミン剤' }]),
+      height: '168',
+      weight: '65',
+      disability: null,
+      notes: JSON.stringify({ otherNotes: '毎朝の散歩を日課にしています。' }),
+    },
+    {
+      userId: createdUsers[4].id,
+      bloodType: 'A型',
+      allergy: JSON.stringify(['抗生物質']),
+      medicine: JSON.stringify([{ name: '鎮痛剤' }, { name: '湿布' }]),
+      height: '158',
+      weight: '50',
+      disability: '右足骨折（リハビリ中）',
+      notes: JSON.stringify({ otherNotes: '松葉杖を使用しています。段差に注意が必要です。' }),
     },
   ]
 
@@ -162,6 +212,7 @@ export async function seed(prisma: PrismaClient) {
     { userStatusCardId: createdStatusCards[1].id, name: '骨粗しょう症' },
     { userStatusCardId: createdStatusCards[2].id, name: '2型糖尿病' },
     { userStatusCardId: createdStatusCards[2].id, name: '高脂血症' },
+    { userStatusCardId: createdStatusCards[4].id, name: '右脛骨骨折' },
   ]
 
   for (const disease of diseases) {
@@ -191,6 +242,16 @@ export async function seed(prisma: PrismaClient) {
       hospitalName: '品川糖尿病センター',
       hospitalPhone: '03-3456-7890',
     },
+    {
+      userId: createdUsers[3].id,
+      hospitalName: '豊島総合病院',
+      hospitalPhone: '03-5555-6666',
+    },
+    {
+      userId: createdUsers[4].id,
+      hospitalName: '赤坂整形外科',
+      hospitalPhone: '03-7777-8888',
+    },
   ]
 
   for (const helpCard of helpCards) {
@@ -207,9 +268,10 @@ export async function seed(prisma: PrismaClient) {
   console.log('📝 Seeding emergency contacts...')
 
   const emergencyContacts = [
+    // User 1 Contacts
     {
       userId: createdUsers[0].id,
-      helperId: createdHelpers[0].id,
+      helperId: createdHelpers[0].id, // Son
       name: '山田 太郎',
       relationship: '長男',
       phoneNumber: '090-1234-5678',
@@ -219,7 +281,7 @@ export async function seed(prisma: PrismaClient) {
     },
     {
       userId: createdUsers[0].id,
-      helperId: createdHelpers[3].id,
+      helperId: createdHelpers[3].id, // Care Manager
       name: '佐藤 美咲',
       relationship: 'ケアマネージャー',
       phoneNumber: '080-4567-8901',
@@ -227,9 +289,10 @@ export async function seed(prisma: PrismaClient) {
       address: '東京都新宿区高田馬場2-2-2',
       isMain: false,
     },
+    // User 2 Contacts
     {
       userId: createdUsers[1].id,
-      helperId: createdHelpers[1].id,
+      helperId: createdHelpers[1].id, // Daughter
       name: '山田 花子',
       relationship: '長女',
       phoneNumber: '080-2345-6789',
@@ -239,7 +302,7 @@ export async function seed(prisma: PrismaClient) {
     },
     {
       userId: createdUsers[1].id,
-      helperId: createdHelpers[5].id,
+      helperId: createdHelpers[5].id, // Nurse
       name: '高橋 恵子',
       relationship: '訪問看護師',
       phoneNumber: '080-6789-0123',
@@ -247,14 +310,47 @@ export async function seed(prisma: PrismaClient) {
       address: '東京都港区六本木4-4-4',
       isMain: false,
     },
+    // User 3 Contacts
     {
       userId: createdUsers[2].id,
-      helperId: createdHelpers[2].id,
+      helperId: createdHelpers[2].id, // Helper
       name: '田中 次郎',
       relationship: 'ヘルパー',
       phoneNumber: '070-3456-7890',
       email: 'jiro.tanaka@care-service.com',
       address: '東京都品川区五反田5-5-5',
+      isMain: true,
+    },
+    {
+      userId: createdUsers[2].id,
+      helperId: createdHelpers[6].id, // Doctor
+      name: '中村 医師',
+      relationship: '主治医',
+      phoneNumber: '03-1111-2222',
+      email: 'nakamura@hospital.com',
+      address: '東京都品川区大崎病院',
+      isMain: false,
+    },
+    // User 4 Contacts
+    {
+      userId: createdUsers[3].id,
+      helperId: createdHelpers[4].id, // Neighbor
+      name: '鈴木 健一',
+      relationship: '近隣住民',
+      phoneNumber: '090-5678-9012',
+      email: 'kenichi.suzuki@example.com',
+      address: '東京都豊島区池袋4-4-5',
+      isMain: true,
+    },
+    // User 5 Contacts
+    {
+      userId: createdUsers[4].id,
+      helperId: createdHelpers[7].id, // Volunteer
+      name: 'ボランティア 田中',
+      relationship: 'ボランティア',
+      phoneNumber: '090-9999-8888',
+      email: 'volunteer.tanaka@npo.org',
+      address: '東京都港区赤坂NPOセンター',
       isMain: true,
     },
   ]
@@ -279,6 +375,7 @@ export async function seed(prisma: PrismaClient) {
 
   const now = new Date()
   const schedules = [
+    // User 1
     {
       userId: createdUsers[0].id,
       title: '朝の服薬',
@@ -295,6 +392,7 @@ export async function seed(prisma: PrismaClient) {
       isRepeat: false,
       startAt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 3, 10, 0),
     },
+    // User 2
     {
       userId: createdUsers[1].id,
       title: 'デイサービス',
@@ -311,6 +409,7 @@ export async function seed(prisma: PrismaClient) {
       isRepeat: false,
       startAt: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0),
     },
+    // User 3
     {
       userId: createdUsers[2].id,
       title: 'インスリン注射',
@@ -327,6 +426,32 @@ export async function seed(prisma: PrismaClient) {
       isRepeat: false,
       startAt: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0),
     },
+    // User 4
+    {
+      userId: createdUsers[3].id,
+      title: '健康診断',
+      description: '年1回の定期健診',
+      scheduleType: 'appointment',
+      isRepeat: false,
+      startAt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 10, 9, 30),
+    },
+    {
+      userId: createdUsers[3].id,
+      title: 'ゲートボール',
+      description: '地域のサークル活動',
+      scheduleType: 'social',
+      isRepeat: false,
+      startAt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2, 14, 0),
+    },
+    // User 5
+    {
+      userId: createdUsers[4].id,
+      title: 'リハビリ',
+      description: '理学療法士によるリハビリ',
+      scheduleType: 'rehabilitation',
+      isRepeat: false,
+      startAt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 11, 0),
+    },
   ]
 
   for (const schedule of schedules) {
@@ -341,6 +466,7 @@ export async function seed(prisma: PrismaClient) {
   console.log('📝 Seeding user repeat schedules...')
 
   const repeatSchedules = [
+    // User 1
     {
       userId: createdUsers[0].id,
       title: '朝の服薬',
@@ -357,6 +483,7 @@ export async function seed(prisma: PrismaClient) {
       interval: 1,
       scheduleTime: new Date('1970-01-01T21:00:00'),
     },
+    // User 2
     {
       userId: createdUsers[1].id,
       title: '認知症薬服用',
@@ -365,6 +492,7 @@ export async function seed(prisma: PrismaClient) {
       interval: 1,
       scheduleTime: new Date('1970-01-01T08:00:00'),
     },
+    // User 3
     {
       userId: createdUsers[2].id,
       title: 'インスリン注射',
@@ -380,6 +508,24 @@ export async function seed(prisma: PrismaClient) {
       scheduleType: 'medication',
       interval: 1,
       scheduleTime: new Date('1970-01-01T06:30:00'),
+    },
+    // User 4
+    {
+      userId: createdUsers[3].id,
+      title: 'ラジオ体操',
+      description: '毎朝の習慣',
+      scheduleType: 'rest',
+      interval: 1,
+      scheduleTime: new Date('1970-01-01T06:30:00'),
+    },
+    // User 5
+    {
+      userId: createdUsers[4].id,
+      title: 'ストレッチ',
+      description: '就寝前のストレッチ',
+      scheduleType: 'rehabilitation',
+      interval: 1,
+      scheduleTime: new Date('1970-01-01T22:00:00'),
     },
   ]
 
@@ -435,6 +581,22 @@ export async function seed(prisma: PrismaClient) {
       alertType: 'medication',
       createdAt: new Date(now.getTime() - 48 * 60 * 60 * 1000),
     },
+    {
+      userId: createdUsers[1].id,
+      title: '徘徊検知',
+      description: '自宅から離れた場所に移動しています',
+      importance: 5,
+      alertType: 'emergency',
+      createdAt: new Date(now.getTime() - 1 * 60 * 60 * 1000),
+    },
+    {
+      userId: createdUsers[3].id,
+      title: 'システムメンテナンス',
+      description: '明日深夜にメンテナンスを行います',
+      importance: 1,
+      alertType: 'system',
+      createdAt: new Date(now.getTime() - 72 * 60 * 60 * 1000),
+    },
   ]
 
   const createdAlerts = []
@@ -456,6 +618,8 @@ export async function seed(prisma: PrismaClient) {
     { userId: createdUsers[1].id, alertId: createdAlerts[2].id, isChecked: false },
     { userId: createdUsers[2].id, alertId: createdAlerts[3].id, isChecked: true },
     { userId: createdUsers[2].id, alertId: createdAlerts[4].id, isChecked: false },
+    { userId: createdUsers[1].id, alertId: createdAlerts[5].id, isChecked: false }, // Emergency
+    { userId: createdUsers[3].id, alertId: createdAlerts[6].id, isChecked: true }, // System
   ]
 
   for (const history of userAlertHistories) {
@@ -483,6 +647,8 @@ export async function seed(prisma: PrismaClient) {
     { helperId: createdHelpers[1].id, alertId: createdAlerts[2].id, isChecked: false },
     { helperId: createdHelpers[2].id, alertId: createdAlerts[3].id, isChecked: true },
     { helperId: createdHelpers[2].id, alertId: createdAlerts[4].id, isChecked: false },
+    { helperId: createdHelpers[1].id, alertId: createdAlerts[5].id, isChecked: false }, // Emergency for Daughter
+    { helperId: createdHelpers[5].id, alertId: createdAlerts[5].id, isChecked: false }, // Emergency for Nurse
   ]
 
   for (const history of helperAlertHistories) {
