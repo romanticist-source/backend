@@ -12,6 +12,7 @@ import { PrismaUserStatusCardRepository, PrismaUserStatusCardDiseaseRepository }
 import { PrismaUserScheduleRepository, PrismaUserRepeatScheduleRepository } from '../internal/adapters/gateways/prisma-user-schedule-repository.js'
 import { PrismaAlertHistoryRepository } from '../internal/adapters/gateways/prisma-alert-history-repository.js'
 import { PrismaUserHelpCardRepository } from '../internal/adapters/gateways/prisma-user-help-card-repository.js'
+import { PrismaHelperConnectRepository } from '../internal/adapters/gateways/prisma-helper-connect-repository.js'
 
 import { UserUseCase } from '../internal/application/usecase/user-usecase.js'
 import { HelperUseCase } from '../internal/application/usecase/helper-usecase.js'
@@ -20,6 +21,7 @@ import { UserStatusCardUseCase } from '../internal/application/usecase/user-stat
 import { UserScheduleUseCase } from '../internal/application/usecase/user-schedule-usecase.js'
 import { AlertHistoryUseCase } from '../internal/application/usecase/alert-history-usecase.js'
 import { UserHelpCardUseCase } from '../internal/application/usecase/user-help-card-usecase.js'
+import { HelperConnectUseCase } from '../internal/application/usecase/helper-connect-usecase.js'
 
 import { createUserRouter } from '../internal/router/user-router-openapi.js'
 import { createHelperRouter } from '../internal/router/helper-router-openapi.js'
@@ -28,6 +30,7 @@ import { createUserStatusCardRouter } from '../internal/router/user-status-card-
 import { createUserScheduleRouter } from '../internal/router/user-schedule-router-openapi.js'
 import { createAlertHistoryRouter } from '../internal/router/alert-history-router-openapi.js'
 import { createUserHelpCardRouter } from '../internal/router/user-help-card-router-openapi.js'
+import { createHelperConnectRouter } from '../internal/router/helper-connect-router-openapi.js'
 
 const app = new OpenAPIHono()
 const allowedOrigin = "http://localhost:8081";
@@ -80,6 +83,11 @@ const userHelpCardRepository = new PrismaUserHelpCardRepository(prisma)
 const userHelpCardUseCase = new UserHelpCardUseCase(userHelpCardRepository)
 const userHelpCardRouter = createUserHelpCardRouter(userHelpCardUseCase)
 
+// Helper Connect
+const helperConnectRepository = new PrismaHelperConnectRepository(prisma)
+const helperConnectUseCase = new HelperConnectUseCase(helperConnectRepository)
+const helperConnectRouter = createHelperConnectRouter(helperConnectUseCase)
+
 const welcomeStrings = [
   'Hello Hono!',
   'To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/backend/hono'
@@ -97,6 +105,7 @@ app.route('/user-status-cards', userStatusCardRouter)
 app.route('/user-schedules', userScheduleRouter)
 app.route('/alerts', alertHistoryRouter)
 app.route('/user-help-cards', userHelpCardRouter)
+app.route('/helper-connect', helperConnectRouter)
 
 // OpenAPI JSON endpoint
 app.doc('/doc', {
