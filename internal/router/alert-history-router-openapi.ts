@@ -2,6 +2,23 @@ import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
 import type { AlertHistoryUseCase } from '../application/usecase/alert-history-usecase.js'
 import { AlertHistorySchema, CreateAlertHistorySchema, UpdateAlertHistorySchema, ErrorSchema } from '../schemas/alert-history-schema.js'
 
+// User/Helper Alert History Schemas
+const UserAlertHistorySchema = z.object({
+  userId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174000' }),
+  alertId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174006' }),
+  isChecked: z.boolean().openapi({ example: true }),
+})
+
+const HelperAlertHistorySchema = z.object({
+  helperId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174001' }),
+  alertId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174006' }),
+  isChecked: z.boolean().openapi({ example: true }),
+})
+
+const MessageSchema = z.object({
+  message: z.string().openapi({ example: 'Alert marked as checked' }),
+})
+
 export function createAlertHistoryRouter(useCase: AlertHistoryUseCase) {
   const router = new OpenAPIHono()
 
@@ -245,14 +262,152 @@ export function createAlertHistoryRouter(useCase: AlertHistoryUseCase) {
       try {
         const { id } = c.req.valid('param')
         const success = await useCase.deleteAlert(id)
-        
+
         if (!success) {
           return c.json({ error: 'Alert not found' }, 404)
         }
-        
+
         return c.json({ success: true }, 200)
       } catch (error) {
         return c.json({ error: 'Failed to delete alert' }, 500)
+      }
+    }
+  )
+
+  // GET /alerts/user-history/:userId - Get user alert history
+  router.openapi(
+    createRoute({
+      method: 'get',
+      path: '/user-history/{userId}',
+      tags: ['Alert History'],
+      summary: 'ユーザーの既読履歴を取得',
+      request: {
+        params: z.object({
+          userId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174000' })
+        })
+      },
+      responses: {
+        200: {
+          description: '既読履歴の取得成功',
+          content: { 'application/json': { schema: z.array(UserAlertHistorySchema) } }
+        },
+        500: {
+          description: 'サーバーエラー',
+          content: { 'application/json': { schema: ErrorSchema } }
+        }
+      }
+    }),
+    async (c) => {
+      try {
+        const { userId } = c.req.valid('param')
+        const history = await useCase.getUserAlertHistory(userId)
+        return c.json(history, 200)
+      } catch (error) {
+        return c.json({ error: 'Failed to fetch user alert history' }, 500)
+      }
+    }
+  )
+
+  // POST /alerts/:alertHistoryId/check-by-user/:userId - Mark alert as checked by user
+  router.openapi(
+    createRoute({
+      method: 'post',
+      path: '/{alertHistoryId}/check-by-user/{userId}',
+      tags: ['Alert History'],
+      summary: 'ユーザーがアラートを既読にする',
+      request: {
+        params: z.object({
+          alertHistoryId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174006' }),
+          userId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174000' })
+        })
+      },
+      responses: {
+        200: {
+          description: '既読マークの成功',
+          content: { 'application/json': { schema: MessageSchema } }
+        },
+        500: {
+          description: 'サーバーエラー',
+          content: { 'application/json': { schema: ErrorSchema } }
+        }
+      }
+    }),
+    async (c) => {
+      try {
+        const { alertHistoryId, userId } = c.req.valid('param')
+        await useCase.markAsCheckedByUser(alertHistoryId, userId)
+        return c.json({ message: 'Alert marked as checked by user' }, 200)
+      } catch (error) {
+        return c.json({ error: 'Failed to mark alert as checked' }, 500)
+      }
+    }
+  )
+
+  // GET /alerts/helper-history/:helperId - Get helper alert history
+  router.openapi(
+    createRoute({
+      method: 'get',
+      path: '/helper-history/{helperId}',
+      tags: ['Alert History'],
+      summary: 'ヘルパーの既読履歴を取得',
+      request: {
+        params: z.object({
+          helperId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174001' })
+        })
+      },
+      responses: {
+        200: {
+          description: '既読履歴の取得成功',
+          content: { 'application/json': { schema: z.array(HelperAlertHistorySchema) } }
+        },
+        500: {
+          description: 'サーバーエラー',
+          content: { 'application/json': { schema: ErrorSchema } }
+        }
+      }
+    }),
+    async (c) => {
+      try {
+        const { helperId } = c.req.valid('param')
+        const history = await useCase.getHelperAlertHistory(helperId)
+        return c.json(history, 200)
+      } catch (error) {
+        return c.json({ error: 'Failed to fetch helper alert history' }, 500)
+      }
+    }
+  )
+
+  // POST /alerts/:alertHistoryId/check-by-helper/:helperId - Mark alert as checked by helper
+  router.openapi(
+    createRoute({
+      method: 'post',
+      path: '/{alertHistoryId}/check-by-helper/{helperId}',
+      tags: ['Alert History'],
+      summary: 'ヘルパーがアラートを既読にする',
+      request: {
+        params: z.object({
+          alertHistoryId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174006' }),
+          helperId: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174001' })
+        })
+      },
+      responses: {
+        200: {
+          description: '既読マークの成功',
+          content: { 'application/json': { schema: MessageSchema } }
+        },
+        500: {
+          description: 'サーバーエラー',
+          content: { 'application/json': { schema: ErrorSchema } }
+        }
+      }
+    }),
+    async (c) => {
+      try {
+        const { alertHistoryId, helperId } = c.req.valid('param')
+        await useCase.markAsCheckedByHelper(alertHistoryId, helperId)
+        return c.json({ message: 'Alert marked as checked by helper' }, 200)
+      } catch (error) {
+        return c.json({ error: 'Failed to mark alert as checked' }, 500)
       }
     }
   )

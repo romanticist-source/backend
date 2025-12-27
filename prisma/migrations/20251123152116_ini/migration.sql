@@ -1,10 +1,10 @@
 -- CreateTable
 CREATE TABLE "user" (
-    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "age" INTEGER NOT NULL,
+    "age" INTEGER,
     "mail" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "icon" TEXT,
     "address" TEXT,
     "comment" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -45,6 +45,10 @@ CREATE TABLE "user_status_card" (
     "blood_type" TEXT,
     "allergy" TEXT,
     "medicine" TEXT,
+    "height" TEXT,
+    "weight" TEXT,
+    "disability" TEXT,
+    "notes" TEXT,
 
     CONSTRAINT "user_status_card_pkey" PRIMARY KEY ("id")
 );
@@ -62,6 +66,8 @@ CREATE TABLE "user_status_card_disease" (
 CREATE TABLE "user_help_card" (
     "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
     "user_id" TEXT NOT NULL,
+    "hospital_name" TEXT,
+    "hospital_phone" TEXT,
 
     CONSTRAINT "user_help_card_pkey" PRIMARY KEY ("id")
 );

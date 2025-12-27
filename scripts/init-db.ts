@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { seed } from './seed.js'
 
 console.log('🚀 Initializing database with Prisma...')
 
@@ -8,10 +9,12 @@ try {
   // Test database connection
   await prisma.$connect()
   console.log('✅ Database connection successful')
-  
-  // You can add seed data here if needed
+
+  // Run seed
+  await seed(prisma)
+
   console.log('✨ Database initialization completed')
-  
+
   await prisma.$disconnect()
   process.exit(0)
 } catch (error) {

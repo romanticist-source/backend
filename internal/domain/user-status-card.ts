@@ -5,6 +5,10 @@ export interface UserStatusCard {
   bloodType: string | null
   allergy: string | null
   medicine: string | null
+  height: string | null
+  weight: string | null
+  disability: string | null
+  notes: string | null
 }
 
 export type CreateUserStatusCardInput = Omit<UserStatusCard, 'id'>

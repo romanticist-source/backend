@@ -34,10 +34,10 @@ export interface AlertHistoryRepository {
   delete(id: string): Promise<boolean>
   
   // User alert history operations
-  markAsCheckedByUser(userId: string, alertId: string): Promise<boolean>
+  markAsCheckedByUser(alertId: string, userId: string): Promise<boolean>
   getUserAlertHistory(userId: string): Promise<UserAlertHistory[]>
-  
+
   // Helper alert history operations
-  markAsCheckedByHelper(helperId: string, alertId: string): Promise<boolean>
+  markAsCheckedByHelper(alertId: string, helperId: string): Promise<boolean>
   getHelperAlertHistory(helperId: string): Promise<HelperAlertHistory[]>
 }

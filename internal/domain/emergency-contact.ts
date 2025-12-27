@@ -5,6 +5,8 @@ export interface EmergencyContact {
   name: string
   relationship: string
   phoneNumber: string
+  email: string | null
+  address: string | null
   isMain: boolean
 }
 
