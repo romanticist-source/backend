@@ -1,8 +1,11 @@
 {
   "version": 2,
+  "buildCommand": "prisma generate && tsc",
+  "installCommand": "pnpm install",
   "functions": {
-    "src/index.ts": {
-      "runtime": "nodejs24.x"
+    "src/index.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 10
     }
   },
   "rewrites": [
@@ -10,5 +13,8 @@
       "source": "/(.*)",
       "destination": "src/index.ts"
     }
-  ]
+  ],
+  "env": {
+    "DATABASE_URL": "@database_url"
+  }
 }
