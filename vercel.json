@@ -1,8 +1,10 @@
 {
-  "rewrites": [
-    {
-      "source": "/internal/(.*)",
-      "destination": "/internal"
+  "functions": {
+    "src/index.ts": {
+      "runtime": "@vercel/node"
     }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "src/index.ts" }
   ]
 }
