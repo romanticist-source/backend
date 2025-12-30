@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch api/index.ts",
-    "build": "prisma generate && tsc",
+    "build": "tsx prisma generate && tsc",
     "db:init": "tsx scripts/init-db.ts",
     "db:setup": "pnpm db:migrate && pnpm db:init",
     "db:migrate": "prisma migrate dev",
