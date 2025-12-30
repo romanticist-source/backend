@@ -115,7 +115,7 @@ export function createHelperRouter(helperUseCase: HelperUseCase) {
 
 ### 3. インポートを更新
 
-`src/index.ts`で新しいルーターをインポートします:
+`api/index.ts`で新しいルーターをインポートします:
 
 ```typescript
 import { createHelperRouter } from '../internal/router/helper-router-openapi.js'
