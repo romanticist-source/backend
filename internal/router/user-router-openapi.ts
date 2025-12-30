@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { getCookie } from "hono/cookie";
 import type { UserUseCase } from "../application/usecase/user-usecase.js";
 import {
   UserSchema,
@@ -52,11 +53,11 @@ export function createUserRouter(userUseCase: UserUseCase) {
       const includeDeleted = c.req.valid("query").includeDeleted === "true";
       const users = await userUseCase.getAllUsers(includeDeleted);
 
-      // Remove password from response
+      // Convert dates to ISO strings
       const sanitizedUsers = users.map((user) => {
-        const { password, ...userWithoutPassword } = user;
         return {
-          ...userWithoutPassword,
+          ...user,
+          age: user.age ?? 0,
           createdAt: user.createdAt.toISOString(),
           updatedAt: user.updatedAt.toISOString(),
         };
@@ -120,11 +121,10 @@ export function createUserRouter(userUseCase: UserUseCase) {
         return c.json({ error: "User not found" }, 404);
       }
 
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
       return c.json(
         {
-          ...userWithoutPassword,
+          ...user,
+          age: user.age ?? 0,
           createdAt: user.createdAt.toISOString(),
           updatedAt: user.updatedAt.toISOString(),
         },
@@ -187,11 +187,10 @@ export function createUserRouter(userUseCase: UserUseCase) {
         return c.json({ error: "User not found" }, 404);
       }
 
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
       return c.json(
         {
-          ...userWithoutPassword,
+          ...user,
+          age: user.age ?? 0,
           createdAt: user.createdAt.toISOString(),
           updatedAt: user.updatedAt.toISOString(),
         },
@@ -241,13 +240,18 @@ export function createUserRouter(userUseCase: UserUseCase) {
   router.openapi(createUserRoute, async (c) => {
     try {
       const body = c.req.valid("json");
-      const user = await userUseCase.createUser(body);
+      const createInput = {
+        ...body,
+        icon: body.icon ?? "",
+        address: body.address ?? "",
+        comment: body.comment ?? "",
+      };
+      const user = await userUseCase.createUser(createInput);
 
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
       return c.json(
         {
-          ...userWithoutPassword,
+          ...user,
+          age: user.age ?? 0,
           createdAt: user.createdAt.toISOString(),
           updatedAt: user.updatedAt.toISOString(),
         },
@@ -320,11 +324,10 @@ export function createUserRouter(userUseCase: UserUseCase) {
         return c.json({ error: "User not found" }, 404);
       }
 
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
       return c.json(
         {
-          ...userWithoutPassword,
+          ...user,
+          age: user.age ?? 0,
           createdAt: user.createdAt.toISOString(),
           updatedAt: user.updatedAt.toISOString(),
         },
@@ -502,15 +505,22 @@ export function createUserRouter(userUseCase: UserUseCase) {
   });
 
   router.openapi(upsertGoogleUserRoute, async (c) => {
+    const body = c.req.valid("json");
+    if (!body.id || !body.mail || !body.name) {
+      return c.json({ error: "Missing required fields" }, 400);
+    }
     try {
-      const body = c.req.valid("json");
-      if (!body.id || !body.mail || !body.name) {
-        return c.json({ error: "Missing required fields" }, 400);
-      }
-      const user = await userUseCase.upsertGoogleUser(body);
+      const createInput = {
+        ...body,
+        icon: body.icon ?? "",
+        address: body.address ?? "",
+        comment: body.comment ?? "",
+      };
+      const user = await userUseCase.upsertGoogleUser(createInput);
       return c.json(
         {
           ...user,
+          age: user.age ?? 0,
           createdAt: user.createdAt.toISOString(),
           updatedAt: user.updatedAt.toISOString(),
         },
@@ -519,7 +529,7 @@ export function createUserRouter(userUseCase: UserUseCase) {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to login via Google";
-      return c.json({ error: message }, 400);
+      return c.json({ error: message }, 500);
     }
   });
 
@@ -570,7 +580,7 @@ export function createUserRouter(userUseCase: UserUseCase) {
   router.openapi(getMeRoute, async (c) => {
     try {
       // CookieからuserIdを取得
-      const userId = c.req.cookie("auth");
+      const userId = getCookie(c, "auth");
       if (!userId) {
         return c.json({ error: "Not logged in" }, 401);
       }
@@ -581,6 +591,8 @@ export function createUserRouter(userUseCase: UserUseCase) {
       }
       return c.json(
         {
+          ...user,
+          age: user.age ?? 0,
           createdAt: user.createdAt.toISOString(),
           updatedAt: user.updatedAt.toISOString(),
         },
