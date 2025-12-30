@@ -139,15 +139,17 @@ app.doc("/doc", {
 // Swagger UI endpoint
 app.get("/ui", swaggerUI({ url: "/doc" }));
 
-// Start the server
-const port = Number(process.env.PORT) || 3000;
-const server = serve({
-  fetch: app.fetch,
-  port,
-});
+// Start the server only in development (not on Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  const port = Number(process.env.PORT) || 3000;
+  serve({
+    fetch: app.fetch,
+    port,
+  });
 
-console.log(`🚀 Server is running on http://localhost:${port}`);
-console.log(`📚 Swagger UI: http://localhost:${port}/ui`);
-console.log(`📄 OpenAPI JSON: http://localhost:${port}/doc`);
+  console.log(`🚀 Server is running on http://localhost:${port}`);
+  console.log(`📚 Swagger UI: http://localhost:${port}/ui`);
+  console.log(`📄 OpenAPI JSON: http://localhost:${port}/doc`);
+}
 
 export default handle(app);
