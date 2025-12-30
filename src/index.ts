@@ -3,7 +3,6 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import { PrismaClient } from "@prisma/client";
 import { serve } from "@hono/node-server";
-import { Cookie } from "hono/utils/cookie";
 import { handle } from "hono/vercel";
 
 import { PrismaUserRepository } from "../internal/adapters/gateways/prisma-user-repository.js";
