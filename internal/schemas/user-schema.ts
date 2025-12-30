@@ -29,7 +29,6 @@ export const UpdateUserSchema = z.object({
   age: z.number().int().positive().optional().openapi({ example: 65 }),
   mail: z.string().email().optional().openapi({ example: 'yamada@example.com' }),
   icon: z.string().url().optional().openapi({ example: 'https://lh3.googleusercontent.com/.../photo.jpg' }), // ← 追加
-  password: z.string().min(8).optional().openapi({ example: 'password123' }),
   address: z.string().optional().openapi({ example: '東京都渋谷区1-1-1' }),
   comment: z.string().optional().openapi({ example: '備考欄' })
 }).openapi('UpdateUser')

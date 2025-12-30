@@ -12,6 +12,18 @@ export class PrismaUserRepository implements UserRepository {
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        age: true,
+        mail: true,
+        icon: true,
+        address: true,
+        comment: true,
+        createdAt: true,
+        updatedAt: true,
+        isDeleted: true,
+      },
     });
     return user;
   }
@@ -19,12 +31,36 @@ export class PrismaUserRepository implements UserRepository {
   async findAll(includeDeleted = false): Promise<User[]> {
     return await this.prisma.user.findMany({
       where: includeDeleted ? {} : { isDeleted: false },
+      select: {
+        id: true,
+        name: true,
+        age: true,
+        mail: true,
+        icon: true,
+        address: true,
+        comment: true,
+        createdAt: true,
+        updatedAt: true,
+        isDeleted: true,
+      },
     });
   }
 
   async findByMail(mail: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { mail },
+      select: {
+        id: true,
+        name: true,
+        age: true,
+        mail: true,
+        icon: true,
+        address: true,
+        comment: true,
+        createdAt: true,
+        updatedAt: true,
+        isDeleted: true,
+      },
     });
     return user;
   }
@@ -32,6 +68,18 @@ export class PrismaUserRepository implements UserRepository {
   async create(input: CreateUserInput): Promise<User> {
     return await this.prisma.user.create({
       data: input,
+      select: {
+        id: true,
+        name: true,
+        age: true,
+        mail: true,
+        icon: true,
+        address: true,
+        comment: true,
+        createdAt: true,
+        updatedAt: true,
+        isDeleted: true,
+      },
     });
   }
 
@@ -40,6 +88,18 @@ export class PrismaUserRepository implements UserRepository {
       return await this.prisma.user.update({
         where: { id },
         data: input,
+        select: {
+          id: true,
+          name: true,
+          age: true,
+          mail: true,
+          icon: true,
+          address: true,
+          comment: true,
+          createdAt: true,
+          updatedAt: true,
+          isDeleted: true,
+        },
       });
     } catch {
       return null;
@@ -91,6 +151,18 @@ export class PrismaUserRepository implements UserRepository {
         icon: input.icon,
         address: input.address,
         comment: input.comment,
+      },
+      select: {
+        id: true,
+        name: true,
+        age: true,
+        mail: true,
+        icon: true,
+        address: true,
+        comment: true,
+        createdAt: true,
+        updatedAt: true,
+        isDeleted: true,
       },
     });
   }

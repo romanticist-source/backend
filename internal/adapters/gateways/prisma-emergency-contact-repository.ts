@@ -12,12 +12,32 @@ export class PrismaEmergencyContactRepository implements EmergencyContactReposit
   async findByUserId(userId: string): Promise<EmergencyContact[]> {
     return await this.prisma.emergencyContact.findMany({
       where: { userId },
+      select: {
+        userId: true,
+        helperId: true,
+        name: true,
+        relationship: true,
+        phoneNumber: true,
+        email: true,
+        address: true,
+        isMain: true,
+      },
     })
   }
 
   async findByHelperId(helperId: string): Promise<EmergencyContact[]> {
     return await this.prisma.emergencyContact.findMany({
       where: { helperId },
+      select: {
+        userId: true,
+        helperId: true,
+        name: true,
+        relationship: true,
+        phoneNumber: true,
+        email: true,
+        address: true,
+        isMain: true,
+      },
     })
   }
 
@@ -26,16 +46,47 @@ export class PrismaEmergencyContactRepository implements EmergencyContactReposit
       where: {
         userId_helperId: { userId, helperId },
       },
+      select: {
+        userId: true,
+        helperId: true,
+        name: true,
+        relationship: true,
+        phoneNumber: true,
+        email: true,
+        address: true,
+        isMain: true,
+      },
     })
   }
 
   async findAll(): Promise<EmergencyContact[]> {
-    return await this.prisma.emergencyContact.findMany()
+    return await this.prisma.emergencyContact.findMany({
+      select: {
+        userId: true,
+        helperId: true,
+        name: true,
+        relationship: true,
+        phoneNumber: true,
+        email: true,
+        address: true,
+        isMain: true,
+      },
+    })
   }
 
   async create(input: CreateEmergencyContactInput): Promise<EmergencyContact> {
     return await this.prisma.emergencyContact.create({
       data: input,
+      select: {
+        userId: true,
+        helperId: true,
+        name: true,
+        relationship: true,
+        phoneNumber: true,
+        email: true,
+        address: true,
+        isMain: true,
+      },
     })
   }
 
@@ -46,6 +97,16 @@ export class PrismaEmergencyContactRepository implements EmergencyContactReposit
           userId_helperId: { userId, helperId },
         },
         data: input,
+        select: {
+          userId: true,
+          helperId: true,
+          name: true,
+          relationship: true,
+          phoneNumber: true,
+          email: true,
+          address: true,
+          isMain: true,
+        },
       })
     } catch {
       return null
