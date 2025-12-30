@@ -1,9 +1,11 @@
-import { OpenAPIHono } from '@hono/zod-openapi'
-import { swaggerUI } from '@hono/swagger-ui'
-import { cors } from 'hono/cors'
-import { PrismaClient } from '@prisma/client'
-import { serve } from '@hono/node-server'
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { swaggerUI } from "@hono/swagger-ui";
+import { cors } from "hono/cors";
+import { PrismaClient } from "@prisma/client";
+import { serve } from "@hono/node-server";
 import { Cookie } from "hono/utils/cookie";
+
+import { handle } from "hono/vercel";
 
 import { PrismaUserRepository } from '../internal/adapters/gateways/prisma-user-repository.js'
 import { PrismaHelperRepository } from '../internal/adapters/gateways/prisma-helper-repository.js'
@@ -33,55 +35,72 @@ import { createUserHelpCardRouter } from '../internal/router/user-help-card-rout
 import { createHelperConnectRouter } from '../internal/router/helper-connect-router-openapi.js'
 
 const app = new OpenAPIHono()
+
 const allowedOrigin = "http://localhost:8081";
 // CORS middleware
-app.use('*', cors({
-  origin: allowedOrigin,
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}))
+app.use(
+  "*",
+  cors({
+    origin: allowedOrigin,
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 // Initialize Prisma Client
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 // Dependency Injection - Wiring up the Hexagonal Architecture
 // User
-const userRepository = new PrismaUserRepository(prisma)
-const userUseCase = new UserUseCase(userRepository)
-const userRouter = createUserRouter(userUseCase)
+const userRepository = new PrismaUserRepository(prisma);
+const userUseCase = new UserUseCase(userRepository);
+const userRouter = createUserRouter(userUseCase);
 
 // Helper
-const helperRepository = new PrismaHelperRepository(prisma)
-const helperUseCase = new HelperUseCase(helperRepository)
-const helperRouter = createHelperRouter(helperUseCase)
+const helperRepository = new PrismaHelperRepository(prisma);
+const helperUseCase = new HelperUseCase(helperRepository);
+const helperRouter = createHelperRouter(helperUseCase);
 
 // Emergency Contact
-const emergencyContactRepository = new PrismaEmergencyContactRepository(prisma)
-const emergencyContactUseCase = new EmergencyContactUseCase(emergencyContactRepository)
-const emergencyContactRouter = createEmergencyContactRouter(emergencyContactUseCase)
+const emergencyContactRepository = new PrismaEmergencyContactRepository(prisma);
+const emergencyContactUseCase = new EmergencyContactUseCase(
+  emergencyContactRepository
+);
+const emergencyContactRouter = createEmergencyContactRouter(
+  emergencyContactUseCase
+);
 
 // User Status Card
-const userStatusCardRepository = new PrismaUserStatusCardRepository(prisma)
-const userStatusCardDiseaseRepository = new PrismaUserStatusCardDiseaseRepository(prisma)
-const userStatusCardUseCase = new UserStatusCardUseCase(userStatusCardRepository, userStatusCardDiseaseRepository)
-const userStatusCardRouter = createUserStatusCardRouter(userStatusCardUseCase)
+const userStatusCardRepository = new PrismaUserStatusCardRepository(prisma);
+const userStatusCardDiseaseRepository =
+  new PrismaUserStatusCardDiseaseRepository(prisma);
+const userStatusCardUseCase = new UserStatusCardUseCase(
+  userStatusCardRepository,
+  userStatusCardDiseaseRepository
+);
+const userStatusCardRouter = createUserStatusCardRouter(userStatusCardUseCase);
 
 // User Schedule
-const userScheduleRepository = new PrismaUserScheduleRepository(prisma)
-const userRepeatScheduleRepository = new PrismaUserRepeatScheduleRepository(prisma)
-const userScheduleUseCase = new UserScheduleUseCase(userScheduleRepository, userRepeatScheduleRepository)
-const userScheduleRouter = createUserScheduleRouter(userScheduleUseCase)
+const userScheduleRepository = new PrismaUserScheduleRepository(prisma);
+const userRepeatScheduleRepository = new PrismaUserRepeatScheduleRepository(
+  prisma
+);
+const userScheduleUseCase = new UserScheduleUseCase(
+  userScheduleRepository,
+  userRepeatScheduleRepository
+);
+const userScheduleRouter = createUserScheduleRouter(userScheduleUseCase);
 
 // Alert History
-const alertHistoryRepository = new PrismaAlertHistoryRepository(prisma)
-const alertHistoryUseCase = new AlertHistoryUseCase(alertHistoryRepository)
-const alertHistoryRouter = createAlertHistoryRouter(alertHistoryUseCase)
+const alertHistoryRepository = new PrismaAlertHistoryRepository(prisma);
+const alertHistoryUseCase = new AlertHistoryUseCase(alertHistoryRepository);
+const alertHistoryRouter = createAlertHistoryRouter(alertHistoryUseCase);
 
 // User Help Card
-const userHelpCardRepository = new PrismaUserHelpCardRepository(prisma)
-const userHelpCardUseCase = new UserHelpCardUseCase(userHelpCardRepository)
-const userHelpCardRouter = createUserHelpCardRouter(userHelpCardUseCase)
+const userHelpCardRepository = new PrismaUserHelpCardRepository(prisma);
+const userHelpCardUseCase = new UserHelpCardUseCase(userHelpCardRepository);
+const userHelpCardRouter = createUserHelpCardRouter(userHelpCardUseCase);
 
 // Helper Connect
 const helperConnectRepository = new PrismaHelperConnectRepository(prisma)
@@ -89,13 +108,13 @@ const helperConnectUseCase = new HelperConnectUseCase(helperConnectRepository)
 const helperConnectRouter = createHelperConnectRouter(helperConnectUseCase)
 
 const welcomeStrings = [
-  'Hello Hono!',
-  'To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/backend/hono'
-]
+  "Hello Hono!",
+  "To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/backend/hono",
+];
 
-app.get('/', (c) => {
-  return c.text(welcomeStrings.join('\n\n'))
-})
+app.get("/", (c) => {
+  return c.text(welcomeStrings.join("\n\n"));
+});
 
 // Mount routes with /api prefix
 app.route('/users', userRouter)
@@ -108,34 +127,33 @@ app.route('/user-help-cards', userHelpCardRouter)
 app.route('/helper-connect', helperConnectRouter)
 
 // OpenAPI JSON endpoint
-app.doc('/doc', {
-  openapi: '3.0.0',
+app.doc("/doc", {
+  openapi: "3.0.0",
   info: {
-    version: '1.0.0',
-    title: 'HAL Backend API',
-    description: 'HAL システムのバックエンドAPI'
+    version: "1.0.0",
+    title: "HAL Backend API",
+    description: "HAL システムのバックエンドAPI",
   },
   servers: [
     {
-      url: 'http://localhost:3000',
-      description: '開発環境'
-    }
-  ]
-})
+      url: "http://localhost:3000",
+      description: "開発環境",
+    },
+  ],
+});
 
 // Swagger UI endpoint
-app.get('/ui', swaggerUI({ url: '/doc' }))
+app.get("/ui", swaggerUI({ url: "/doc" }));
 
 // Start the server
-const port = Number(process.env.PORT) || 3000
+const port = Number(process.env.PORT) || 3000;
 const server = serve({
   fetch: app.fetch,
-  port
-})
+  port,
+});
 
-console.log(`🚀 Server is running on http://localhost:${port}`)
-console.log(`📚 Swagger UI: http://localhost:${port}/ui`)
-console.log(`📄 OpenAPI JSON: http://localhost:${port}/doc`)
+console.log(`🚀 Server is running on http://localhost:${port}`);
+console.log(`📚 Swagger UI: http://localhost:${port}/ui`);
+console.log(`📄 OpenAPI JSON: http://localhost:${port}/doc`);
 
-export default app
-
+export default handle(app);
