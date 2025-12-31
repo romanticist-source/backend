@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import { PrismaClient } from "@prisma/client";
+import { serve } from "@hono/node-server";
 import { handle } from "hono/vercel";
 
 import { PrismaUserRepository } from "../internal/adapters/gateways/prisma-user-repository.js";
@@ -35,22 +36,12 @@ import { createAlertHistoryRouter } from "../internal/router/alert-history-route
 import { createUserHelpCardRouter } from "../internal/router/user-help-card-router-openapi.js";
 
 const app = new OpenAPIHono();
-
-// CORS middleware - Allow multiple origins for production and development
-const allowedOrigins = [
-  "http://localhost:8081",
-  "https://yourdomain.vercel.app", // 本番環境のドメインに置き換えてください
-];
-
+const allowedOrigin = "http://localhost:8081";
+// CORS middleware
 app.use(
   "*",
   cors({
-    origin: (origin) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return origin || "*";
-      }
-      return allowedOrigins[0];
-    },
+    origin: allowedOrigin,
     allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -113,26 +104,11 @@ const userHelpCardRouter = createUserHelpCardRouter(userHelpCardUseCase);
 
 const welcomeStrings = [
   "Hello Hono!",
-  "HAL Backend API is running on Vercel",
   "To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/backend/hono",
 ];
 
 app.get("/", (c) => {
-  return c.json({
-    message: welcomeStrings.join("\n"),
-    status: "ok",
-    endpoints: {
-      swagger: "/ui",
-      openapi: "/doc",
-      users: "/users",
-      helpers: "/helpers",
-      emergencyContacts: "/emergency-contacts",
-      userStatusCards: "/user-status-cards",
-      userSchedules: "/user-schedules",
-      alerts: "/alerts",
-      userHelpCards: "/user-help-cards",
-    },
-  });
+  return c.text(welcomeStrings.join("\n\n"));
 });
 
 // Mount routes with /api prefix
@@ -157,14 +133,23 @@ app.doc("/doc", {
       url: "http://localhost:3000",
       description: "開発環境",
     },
-    {
-      url: "https://yourdomain.vercel.app",
-      description: "本番環境",
-    },
   ],
 });
 
 // Swagger UI endpoint
 app.get("/ui", swaggerUI({ url: "/doc" }));
+
+// Start the server only in development (not on Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  const port = Number(process.env.PORT) || 3000;
+  serve({
+    fetch: app.fetch,
+    port,
+  });
+
+  console.log(`🚀 Server is running on http://localhost:${port}`);
+  console.log(`📚 Swagger UI: http://localhost:${port}/ui`);
+  console.log(`📄 OpenAPI JSON: http://localhost:${port}/doc`);
+}
 
 export default handle(app);

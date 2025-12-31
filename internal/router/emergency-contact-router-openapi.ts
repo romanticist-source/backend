@@ -171,7 +171,12 @@ export function createEmergencyContactRouter(useCase: EmergencyContactUseCase) {
     async (c) => {
       try {
         const body = c.req.valid('json')
-        const contact = await useCase.createEmergencyContact(body)
+        const contactInput = {
+          ...body,
+          email: body.email ?? null,
+          address: body.address ?? null
+        }
+        const contact = await useCase.createEmergencyContact(contactInput)
         return c.json(contact, 201)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to create emergency contact'
