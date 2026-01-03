@@ -1,4 +1,7 @@
 import { z } from '@hono/zod-openapi'
+import { extendZodWithOpenApi } from '@hono/zod-openapi'
+
+extendZodWithOpenApi(z);
 
 // Alert History schemas for OpenAPI
 export const AlertHistorySchema = z.object({

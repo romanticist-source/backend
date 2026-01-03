@@ -1,4 +1,7 @@
 import { z } from '@hono/zod-openapi'
+import { extendZodWithOpenApi } from '@hono/zod-openapi'
+
+extendZodWithOpenApi(z);
 
 // Emergency Contact schemas for OpenAPI
 export const EmergencyContactSchema = z.object({

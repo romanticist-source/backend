@@ -1,4 +1,7 @@
 import { z } from '@hono/zod-openapi'
+import { extendZodWithOpenApi } from '@hono/zod-openapi'
+
+extendZodWithOpenApi(z);
 
 // User Help Card schemas for OpenAPI
 export const UserHelpCardSchema = z.object({
