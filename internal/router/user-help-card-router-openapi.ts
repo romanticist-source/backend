@@ -1,5 +1,9 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
+import { extendZodWithOpenApi } from "@hono/zod-openapi";
 import type { UserHelpCardUseCase } from '../application/usecase/user-help-card-usecase.js'
+
+// Zodにopenapiメソッドを追加
+extendZodWithOpenApi(z);
 import { UserHelpCardSchema, CreateUserHelpCardSchema, ErrorSchema } from '../schemas/user-help-card-schema.js'
 
 export function createUserHelpCardRouter(useCase: UserHelpCardUseCase) {
