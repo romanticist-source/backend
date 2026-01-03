@@ -1,9 +1,6 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
 import { extendZodWithOpenApi } from "@hono/zod-openapi";
 import type { UserStatusCardUseCase } from '../application/usecase/user-status-card-usecase.js'
-
-// Zodにopenapiメソッドを追加
-extendZodWithOpenApi(z);
 import { 
   UserStatusCardSchema, 
   CreateUserStatusCardSchema, 
@@ -13,6 +10,9 @@ import {
   UpdateUserStatusCardDiseaseSchema,
   ErrorSchema 
 } from '../schemas/user-status-card-schema.js'
+
+// Zodにopenapiメソッドを追加
+extendZodWithOpenApi(z);
 
 export function createUserStatusCardRouter(useCase: UserStatusCardUseCase) {
   const router = new OpenAPIHono()

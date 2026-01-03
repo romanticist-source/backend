@@ -1,8 +1,10 @@
-import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'import { extendZodWithOpenApi } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
+import { extendZodWithOpenApi } from "@hono/zod-openapi";
+import type { EmergencyContactUseCase } from '../application/usecase/emergency-contact-usecase.js'
+import { EmergencyContactSchema, CreateEmergencyContactSchema, UpdateEmergencyContactSchema, ErrorSchema } from '../schemas/emergency-contact-schema.js'
 
 // Zodにopenapiメソッドを追加
-extendZodWithOpenApi(z);import type { EmergencyContactUseCase } from '../application/usecase/emergency-contact-usecase.js'
-import { EmergencyContactSchema, CreateEmergencyContactSchema, UpdateEmergencyContactSchema, ErrorSchema } from '../schemas/emergency-contact-schema.js'
+extendZodWithOpenApi(z);
 
 export function createEmergencyContactRouter(useCase: EmergencyContactUseCase) {
   const router = new OpenAPIHono()
