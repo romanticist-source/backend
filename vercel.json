@@ -1,7 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install",
-  "installCommand": "pnpm install",
+  "buildCommand": "pnpm install && pnpm prisma generate",
   "outputDirectory": ".",
   "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
 }
