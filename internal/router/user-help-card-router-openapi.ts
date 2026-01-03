@@ -4,7 +4,7 @@ import type { UserHelpCardUseCase } from '../application/usecase/user-help-card-
 
 // Zodにopenapiメソッドを追加
 extendZodWithOpenApi(z);
-import { UserHelpCardSchema, CreateUserHelpCardSchema, ErrorSchema } from '../schemas/user-help-card-schema.js'
+import { UserHelpCardSchema, CreateUserHelpCardSchema, UpdateUserHelpCardSchema, ErrorSchema } from '../schemas/user-help-card-schema.js'
 
 export function createUserHelpCardRouter(useCase: UserHelpCardUseCase) {
   const router = new OpenAPIHono()
@@ -153,6 +153,54 @@ export function createUserHelpCardRouter(useCase: UserHelpCardUseCase) {
         return c.json(card, 201)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to create help card'
+        return c.json({ error: message }, 400)
+      }
+    }
+  )
+
+  // PUT /user-help-cards/:id - Update help card
+  router.openapi(
+    createRoute({
+      method: 'put',
+      path: '/{id}',
+      tags: ['User Help Cards'],
+      summary: 'ヘルプカードを更新',
+      request: {
+        params: z.object({
+          id: z.string().openapi({ example: '123e4567-e89b-12d3-a456-426614174007' })
+        }),
+        body: {
+          content: { 'application/json': { schema: UpdateUserHelpCardSchema } }
+        }
+      },
+      responses: {
+        200: {
+          description: 'ヘルプカードの更新成功',
+          content: { 'application/json': { schema: UserHelpCardSchema } }
+        },
+        404: {
+          description: 'ヘルプカードが見つかりません',
+          content: { 'application/json': { schema: ErrorSchema } }
+        },
+        400: {
+          description: 'リクエストが不正です',
+          content: { 'application/json': { schema: ErrorSchema } }
+        }
+      }
+    }),
+    async (c) => {
+      try {
+        const { id } = c.req.valid('param')
+        const body = c.req.valid('json')
+        const card = await useCase.updateHelpCard(id, body)
+
+        if (!card) {
+          return c.json({ error: 'Help card not found' }, 404)
+        }
+
+        return c.json(card, 200)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to update help card'
         return c.json({ error: message }, 400)
       }
     }

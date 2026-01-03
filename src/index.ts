@@ -3,39 +3,38 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
 import { PrismaClient } from "@prisma/client";
 import { serve } from "@hono/node-server";
+import { Cookie } from "hono/utils/cookie";
 import { handle } from "hono/vercel";
 
-import { PrismaUserRepository } from "../internal/adapters/gateways/prisma-user-repository.js";
-import { PrismaHelperRepository } from "../internal/adapters/gateways/prisma-helper-repository.js";
-import { PrismaEmergencyContactRepository } from "../internal/adapters/gateways/prisma-emergency-contact-repository.js";
-import {
-  PrismaUserStatusCardRepository,
-  PrismaUserStatusCardDiseaseRepository,
-} from "../internal/adapters/gateways/prisma-user-status-card-repository.js";
-import {
-  PrismaUserScheduleRepository,
-  PrismaUserRepeatScheduleRepository,
-} from "../internal/adapters/gateways/prisma-user-schedule-repository.js";
-import { PrismaAlertHistoryRepository } from "../internal/adapters/gateways/prisma-alert-history-repository.js";
-import { PrismaUserHelpCardRepository } from "../internal/adapters/gateways/prisma-user-help-card-repository.js";
+import { PrismaUserRepository } from '../internal/adapters/gateways/prisma-user-repository.js'
+import { PrismaHelperRepository } from '../internal/adapters/gateways/prisma-helper-repository.js'
+import { PrismaEmergencyContactRepository } from '../internal/adapters/gateways/prisma-emergency-contact-repository.js'
+import { PrismaUserStatusCardRepository, PrismaUserStatusCardDiseaseRepository } from '../internal/adapters/gateways/prisma-user-status-card-repository.js'
+import { PrismaUserScheduleRepository, PrismaUserRepeatScheduleRepository } from '../internal/adapters/gateways/prisma-user-schedule-repository.js'
+import { PrismaAlertHistoryRepository } from '../internal/adapters/gateways/prisma-alert-history-repository.js'
+import { PrismaUserHelpCardRepository } from '../internal/adapters/gateways/prisma-user-help-card-repository.js'
+import { PrismaHelperConnectRepository } from '../internal/adapters/gateways/prisma-helper-connect-repository.js'
 
-import { UserUseCase } from "../internal/application/usecase/user-usecase.js";
-import { HelperUseCase } from "../internal/application/usecase/helper-usecase.js";
-import { EmergencyContactUseCase } from "../internal/application/usecase/emergency-contact-usecase.js";
-import { UserStatusCardUseCase } from "../internal/application/usecase/user-status-card-usecase.js";
-import { UserScheduleUseCase } from "../internal/application/usecase/user-schedule-usecase.js";
-import { AlertHistoryUseCase } from "../internal/application/usecase/alert-history-usecase.js";
-import { UserHelpCardUseCase } from "../internal/application/usecase/user-help-card-usecase.js";
+import { UserUseCase } from '../internal/application/usecase/user-usecase.js'
+import { HelperUseCase } from '../internal/application/usecase/helper-usecase.js'
+import { EmergencyContactUseCase } from '../internal/application/usecase/emergency-contact-usecase.js'
+import { UserStatusCardUseCase } from '../internal/application/usecase/user-status-card-usecase.js'
+import { UserScheduleUseCase } from '../internal/application/usecase/user-schedule-usecase.js'
+import { AlertHistoryUseCase } from '../internal/application/usecase/alert-history-usecase.js'
+import { UserHelpCardUseCase } from '../internal/application/usecase/user-help-card-usecase.js'
+import { HelperConnectUseCase } from '../internal/application/usecase/helper-connect-usecase.js'
 
-import { createUserRouter } from "../internal/router/user-router-openapi.js";
-import { createHelperRouter } from "../internal/router/helper-router-openapi.js";
-import { createEmergencyContactRouter } from "../internal/router/emergency-contact-router-openapi.js";
-import { createUserStatusCardRouter } from "../internal/router/user-status-card-router-openapi.js";
-import { createUserScheduleRouter } from "../internal/router/user-schedule-router-openapi.js";
-import { createAlertHistoryRouter } from "../internal/router/alert-history-router-openapi.js";
-import { createUserHelpCardRouter } from "../internal/router/user-help-card-router-openapi.js";
+import { createUserRouter } from '../internal/router/user-router-openapi.js'
+import { createHelperRouter } from '../internal/router/helper-router-openapi.js'
+import { createEmergencyContactRouter } from '../internal/router/emergency-contact-router-openapi.js'
+import { createUserStatusCardRouter } from '../internal/router/user-status-card-router-openapi.js'
+import { createUserScheduleRouter } from '../internal/router/user-schedule-router-openapi.js'
+import { createAlertHistoryRouter } from '../internal/router/alert-history-router-openapi.js'
+import { createUserHelpCardRouter } from '../internal/router/user-help-card-router-openapi.js'
+import { createHelperConnectRouter } from '../internal/router/helper-connect-router-openapi.js'
 
-const app = new OpenAPIHono();
+const app = new OpenAPIHono()
+
 const allowedOrigin = "http://localhost:8081";
 // CORS middleware
 app.use(
@@ -102,6 +101,11 @@ const userHelpCardRepository = new PrismaUserHelpCardRepository(prisma);
 const userHelpCardUseCase = new UserHelpCardUseCase(userHelpCardRepository);
 const userHelpCardRouter = createUserHelpCardRouter(userHelpCardUseCase);
 
+// Helper Connect
+const helperConnectRepository = new PrismaHelperConnectRepository(prisma)
+const helperConnectUseCase = new HelperConnectUseCase(helperConnectRepository)
+const helperConnectRouter = createHelperConnectRouter(helperConnectUseCase)
+
 const welcomeStrings = [
   "Hello Hono!",
   "To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/backend/hono",
@@ -112,13 +116,14 @@ app.get("/", (c) => {
 });
 
 // Mount routes with /api prefix
-app.route("/users", userRouter);
-app.route("/helpers", helperRouter);
-app.route("/emergency-contacts", emergencyContactRouter);
-app.route("/user-status-cards", userStatusCardRouter);
-app.route("/user-schedules", userScheduleRouter);
-app.route("/alerts", alertHistoryRouter);
-app.route("/user-help-cards", userHelpCardRouter);
+app.route('/users', userRouter)
+app.route('/helpers', helperRouter)
+app.route('/emergency-contacts', emergencyContactRouter)
+app.route('/user-status-cards', userStatusCardRouter)
+app.route('/user-schedules', userScheduleRouter)
+app.route('/alerts', alertHistoryRouter)
+app.route('/user-help-cards', userHelpCardRouter)
+app.route('/helper-connect', helperConnectRouter)
 
 // OpenAPI JSON endpoint
 app.doc("/doc", {
