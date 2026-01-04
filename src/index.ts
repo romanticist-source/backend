@@ -1,8 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { PrismaClient } from "@prisma/client";
-import { serve } from "@hono/node-server";
-import { handle } from "hono/vercel";
 import { Hono } from "hono"; // Vercel detection
 
 import { PrismaUserRepository } from "../internal/adapters/gateways/prisma-user-repository.js";
@@ -235,17 +233,4 @@ app.doc("/doc", {
 // Swagger UI endpoint
 app.get("/ui", swaggerUI({ url: "/doc" }));
 
-// Start the server only in development (not on Vercel)
-if (process.env.NODE_ENV !== "production") {
-  const port = Number(process.env.PORT) || 3000;
-  serve({
-    fetch: app.fetch,
-    port,
-  });
-
-  console.log(`🚀 Server is running on http://localhost:${port}`);
-  console.log(`📚 Swagger UI: http://localhost:${port}/ui`);
-  console.log(`📄 OpenAPI JSON: http://localhost:${port}/doc`);
-}
-
-export default handle(app);
+export default app;
