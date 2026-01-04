@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install && prisma generate",
+  "buildCommand": "pnpm install && pnpm prisma generate",
   "rewrites": [
     {
       "source": "/(.*)",
