@@ -1,1 +1,7 @@
-{}
+{
+  "functions": {
+    "src/index.ts": {
+      "maxDuration": 10
+    }
+  }
+}
