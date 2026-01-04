@@ -38,24 +38,42 @@ import { createUserHelpCardRouter } from "../internal/router/user-help-card-rout
 import { createHelperConnectRouter } from "../internal/router/helper-connect-router-openapi.js";
 
 // Prisma Client singleton for serverless environments
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
-const prisma = globalForPrisma.prisma || new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-});
+const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
+  });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 
 const app = new OpenAPIHono();
-const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:8081";
+
+// Allowed origins for CORS
+const allowedOrigins = [
+  "http://localhost:8081",
+  "http://localhost:3000",
+  process.env.ALLOWED_ORIGIN,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+].filter(Boolean) as string[];
 
 // CORS middleware - manual implementation for Vercel compatibility
 app.use("*", async (c, next) => {
+  const origin = c.req.header("Origin");
+  const isAllowed =
+    allowedOrigins.includes(origin as string) ||
+    origin?.endsWith(".vercel.app");
+  const allowedOrigin = isAllowed ? origin : allowedOrigins[0];
+
   // Handle preflight requests
   if (c.req.method === "OPTIONS") {
-    c.header("Access-Control-Allow-Origin", allowedOrigin);
+    c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
     c.header(
       "Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, PATCH, OPTIONS"
@@ -69,7 +87,7 @@ app.use("*", async (c, next) => {
   await next();
 
   // Add CORS headers to all responses
-  c.header("Access-Control-Allow-Origin", allowedOrigin);
+  c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
   c.header("Access-Control-Allow-Credentials", "true");
 });
 
@@ -140,10 +158,10 @@ app.get("/", (c) => {
 
 // Health check endpoint (doesn't require DB connection)
 app.get("/health", (c) => {
-  return c.json({ 
-    status: "ok", 
+  return c.json({
+    status: "ok",
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development"
+    environment: process.env.NODE_ENV || "development",
   });
 });
 
@@ -151,18 +169,21 @@ app.get("/health", (c) => {
 app.get("/health/db", async (c) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    return c.json({ 
-      status: "ok", 
+    return c.json({
+      status: "ok",
       database: "connected",
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    return c.json({ 
-      status: "error", 
-      database: "disconnected",
-      error: error instanceof Error ? error.message : "Unknown error",
-      timestamp: new Date().toISOString()
-    }, 503);
+    return c.json(
+      {
+        status: "error",
+        database: "disconnected",
+        error: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString(),
+      },
+      503
+    );
   }
 });
 
@@ -177,6 +198,30 @@ app.route("/user-help-cards", userHelpCardRouter);
 app.route("/helper-connect", helperConnectRouter);
 
 // OpenAPI JSON endpoint
+const servers = [];
+
+// Add production server if VERCEL_URL is available
+if (process.env.VERCEL_URL) {
+  servers.push({
+    url: `https://${process.env.VERCEL_URL}`,
+    description: "本番環境 (Vercel)",
+  });
+}
+
+// Add custom production server if API_URL is set
+if (process.env.API_URL) {
+  servers.push({
+    url: process.env.API_URL,
+    description: "本番環境",
+  });
+}
+
+// Always add localhost for development
+servers.push({
+  url: "http://localhost:3000",
+  description: "開発環境",
+});
+
 app.doc("/doc", {
   openapi: "3.0.0",
   info: {
@@ -184,12 +229,7 @@ app.doc("/doc", {
     title: "HAL Backend API",
     description: "HAL システムのバックエンドAPI",
   },
-  servers: [
-    {
-      url: "http://localhost:3000",
-      description: "開発環境",
-    },
-  ],
+  servers,
 });
 
 // Swagger UI endpoint
