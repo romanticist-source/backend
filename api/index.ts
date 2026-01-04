@@ -65,7 +65,16 @@ const allowedOrigins = [
 
 // CORS middleware - manual implementation for Vercel compatibility
 app.use("*", async (c, next) => {
-  const origin = c.req.header("Origin");
+  let origin: string | undefined;
+  
+  // Safe header extraction for Vercel environment
+  try {
+    origin = c.req.header("Origin");
+  } catch {
+    // Fallback for Vercel serverless environment
+    origin = c.req.raw?.headers?.get?.("Origin") || undefined;
+  }
+  
   const isAllowed =
     allowedOrigins.includes(origin as string) ||
     origin?.endsWith(".vercel.app");
