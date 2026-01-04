@@ -38,7 +38,7 @@ import { createUserHelpCardRouter } from "../internal/router/user-help-card-rout
 import { createHelperConnectRouter } from "../internal/router/helper-connect-router-openapi.js";
 
 // Prisma Client singleton for serverless environments
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
 const prisma =
   globalForPrisma.prisma ||
@@ -53,6 +53,13 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 
+// Graceful shutdown for Prisma
+if (process.env.NODE_ENV === "production") {
+  process.on('beforeExit', async () => {
+    await prisma.$disconnect();
+  });
+}
+
 const app = new OpenAPIHono();
 
 // Allowed origins for CORS
@@ -63,42 +70,35 @@ const allowedOrigins = [
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
 ].filter(Boolean) as string[];
 
-// CORS middleware - manual implementation for Vercel compatibility
-app.use("*", async (c, next) => {
-  let origin: string | undefined;
-  
-  // Safe header extraction for Vercel environment
-  try {
-    origin = c.req.header("Origin");
-  } catch {
-    // Fallback for Vercel serverless environment
-    origin = c.req.raw?.headers?.get?.("Origin") || undefined;
-  }
-  
-  const isAllowed =
-    allowedOrigins.includes(origin as string) ||
-    origin?.endsWith(".vercel.app");
-  const allowedOrigin = isAllowed ? origin : allowedOrigins[0];
+// CORS middleware - only run in development (Vercel uses vercel.json headers)
+if (process.env.NODE_ENV !== "production") {
+  app.use("*", async (c, next) => {
+    const origin = c.req.header("Origin");
+    const isAllowed =
+      allowedOrigins.includes(origin as string) ||
+      origin?.endsWith(".vercel.app");
+    const allowedOrigin = isAllowed ? origin : allowedOrigins[0];
 
-  // Handle preflight requests
-  if (c.req.method === "OPTIONS") {
+    // Handle preflight requests
+    if (c.req.method === "OPTIONS") {
+      c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
+      c.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+      );
+      c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      c.header("Access-Control-Allow-Credentials", "true");
+      c.header("Access-Control-Max-Age", "86400");
+      return c.body(null, 204);
+    }
+
+    await next();
+
+    // Add CORS headers to all responses
     c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
-    c.header(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-    );
-    c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     c.header("Access-Control-Allow-Credentials", "true");
-    c.header("Access-Control-Max-Age", "86400");
-    return c.body(null, 204);
-  }
-
-  await next();
-
-  // Add CORS headers to all responses
-  c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
-  c.header("Access-Control-Allow-Credentials", "true");
-});
+  });
+}
 
 // Dependency Injection - Wiring up the Hexagonal Architecture
 // User
