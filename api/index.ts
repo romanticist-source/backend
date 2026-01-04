@@ -37,8 +37,19 @@ import { createAlertHistoryRouter } from "../internal/router/alert-history-route
 import { createUserHelpCardRouter } from "../internal/router/user-help-card-router-openapi.js";
 import { createHelperConnectRouter } from "../internal/router/helper-connect-router-openapi.js";
 
+// Prisma Client singleton for serverless environments
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+const prisma = globalForPrisma.prisma || new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}
+
 const app = new OpenAPIHono();
-const allowedOrigin = "http://localhost:8081";
+const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:8081";
 
 // CORS middleware - manual implementation for Vercel compatibility
 app.use("*", async (c, next) => {
@@ -61,9 +72,6 @@ app.use("*", async (c, next) => {
   c.header("Access-Control-Allow-Origin", allowedOrigin);
   c.header("Access-Control-Allow-Credentials", "true");
 });
-
-// Initialize Prisma Client
-const prisma = new PrismaClient();
 
 // Dependency Injection - Wiring up the Hexagonal Architecture
 // User
@@ -128,6 +136,34 @@ const welcomeStrings = [
 
 app.get("/", (c) => {
   return c.text(welcomeStrings.join("\n\n"));
+});
+
+// Health check endpoint (doesn't require DB connection)
+app.get("/health", (c) => {
+  return c.json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development"
+  });
+});
+
+// DB health check endpoint
+app.get("/health/db", async (c) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return c.json({ 
+      status: "ok", 
+      database: "connected",
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    return c.json({ 
+      status: "error", 
+      database: "disconnected",
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString()
+    }, 503);
+  }
 });
 
 // Mount routes with /api prefix
