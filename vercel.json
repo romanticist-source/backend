@@ -3,7 +3,7 @@
   "outputDirectory": ".",
   "rewrites": [
     {
-      "source": "(.*)",
+      "source": "/(.*)",
       "destination": "/api/index.ts"
     }
   ],
