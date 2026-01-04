@@ -1,6 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
-import { cors } from "hono/cors";
 import { PrismaClient } from "@prisma/client";
 import { serve } from "@hono/node-server";
 import { handle } from "hono/vercel";
@@ -40,16 +39,26 @@ import { createHelperConnectRouter } from "../internal/router/helper-connect-rou
 
 const app = new OpenAPIHono();
 const allowedOrigin = "http://localhost:8081";
-// CORS middleware
-app.use(
-  "*",
-  cors({
-    origin: allowedOrigin,
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+
+// CORS middleware - manual implementation for Vercel compatibility
+app.use("*", async (c, next) => {
+  
+  // Handle preflight requests
+  if (c.req.method === "OPTIONS") {
+    c.header("Access-Control-Allow-Origin", allowedOrigin);
+    c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+    c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    c.header("Access-Control-Allow-Credentials", "true");
+    c.header("Access-Control-Max-Age", "86400");
+    return c.body(null, 204);
+  }
+  
+  await next();
+  
+  // Add CORS headers to all responses
+  c.header("Access-Control-Allow-Origin", allowedOrigin);
+  c.header("Access-Control-Allow-Credentials", "true");
+});
 
 // Initialize Prisma Client
 const prisma = new PrismaClient();
