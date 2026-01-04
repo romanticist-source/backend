@@ -1,18 +1,9 @@
 {
   "version": 2,
   "buildCommand": "pnpm install && pnpm prisma generate",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/src"
-    }
+  "routes": [
+    { "src": "/(.*)", "dest": "/src/index.ts" }
   ],
-  "functions": {
-    "src/index.ts": {
-      "maxDuration": 30,
-      "includeFiles": "prisma/**"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
