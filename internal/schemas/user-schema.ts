@@ -9,7 +9,7 @@ export const UserSchema = z
     mail: z.string().email().openapi({ example: "yamada@example.com" }),
     icon: z
       .string()
-      .url()
+      .regex(/^https?:\/\/.+/)
       .optional()
       .nullable()
       .openapi({ example: "https://lh3.googleusercontent.com/.../photo.jpg" }), // ← 追加
@@ -39,7 +39,7 @@ export const CreateUserSchema = z
     mail: z.string().email().openapi({ example: "yamada@example.com" }),
     icon: z
       .string()
-      .url()
+      .regex(/^https?:\/\/.+/)
       .optional()
       .openapi({ example: "https://lh3.googleusercontent.com/.../photo.jpg" }), // ← 追加
     address: z.string().optional().openapi({ example: "東京都渋谷区1-1-1" }),
