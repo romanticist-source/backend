@@ -3,6 +3,7 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { PrismaClient } from "@prisma/client";
 import { serve } from "@hono/node-server";
 import { handle } from "hono/vercel";
+import { Hono } from "hono"; // Vercel detection
 
 import { PrismaUserRepository } from "../internal/adapters/gateways/prisma-user-repository.js";
 import { PrismaHelperRepository } from "../internal/adapters/gateways/prisma-helper-repository.js";
