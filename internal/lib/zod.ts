@@ -1,6 +1,6 @@
 import { extendZodWithOpenApi, z } from "@hono/zod-openapi";
 
-extendZodWithOpenApi(z);
+// extendZodWithOpenApi(z);
 
 export { z };
   
