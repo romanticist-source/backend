@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "vc build",
+  "buildCommand": "vc deploy",
   "rewrites": [
     {
       "source": "/(.*)",
