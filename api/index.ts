@@ -42,19 +42,21 @@ const allowedOrigin = "http://localhost:8081";
 
 // CORS middleware - manual implementation for Vercel compatibility
 app.use("*", async (c, next) => {
-  
   // Handle preflight requests
   if (c.req.method === "OPTIONS") {
     c.header("Access-Control-Allow-Origin", allowedOrigin);
-    c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+    c.header(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    );
     c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     c.header("Access-Control-Allow-Credentials", "true");
     c.header("Access-Control-Max-Age", "86400");
     return c.body(null, 204);
   }
-  
+
   await next();
-  
+
   // Add CORS headers to all responses
   c.header("Access-Control-Allow-Origin", allowedOrigin);
   c.header("Access-Control-Allow-Credentials", "true");
@@ -158,7 +160,7 @@ app.doc("/doc", {
 app.get("/ui", swaggerUI({ url: "/doc" }));
 
 // Start the server only in development (not on Vercel)
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   const port = Number(process.env.PORT) || 3000;
   serve({
     fetch: app.fetch,
