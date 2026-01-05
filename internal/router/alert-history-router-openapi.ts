@@ -1,6 +1,10 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
+import { extendZodWithOpenApi } from "@hono/zod-openapi";
 import type { AlertHistoryUseCase } from '../application/usecase/alert-history-usecase.js'
 import { AlertHistorySchema, CreateAlertHistorySchema, UpdateAlertHistorySchema, ErrorSchema } from '../schemas/alert-history-schema.js'
+
+// Zodにopenapiメソッドを追加
+extendZodWithOpenApi(z);
 
 // User/Helper Alert History Schemas
 const UserAlertHistorySchema = z.object({

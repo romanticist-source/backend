@@ -2,8 +2,8 @@
   "name": "hono",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch api/index.ts",
-    "build": "prisma generate && tsc",
+    "dev": "tsx watch src/index.ts",
+    "build": "prisma generate",
     "db:init": "tsx scripts/init-db.ts",
     "db:setup": "pnpm db:migrate && pnpm db:init",
     "db:migrate": "prisma migrate dev",
@@ -11,7 +11,8 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
-    "docs": "echo 'Open http://localhost:3000/ui in your browser'"
+    "docs": "echo 'Open http://localhost:3000/ui in your browser'",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.6",

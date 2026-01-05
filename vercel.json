@@ -1,7 +1,7 @@
 {
-  "version": 2,
-  "buildCommand": "pnpm install && pnpm prisma generate",
-  "installCommand": "pnpm install",
-  "outputDirectory": ".",
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  "functions": {
+    "src/index.ts": {
+      "maxDuration": 10
+    }
+  }
 }

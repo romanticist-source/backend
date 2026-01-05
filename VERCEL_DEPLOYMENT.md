@@ -5,10 +5,30 @@
 ## 必須の環境変数
 
 ### DATABASE_URL
+
 PostgreSQLデータベースへの接続文字列
 
+**重要**: Vercelのサーバーレス環境では、connection poolingを使用することを強く推奨します。
+
 ```
-DATABASE_URL="postgresql://username:password@host:5432/database?schema=public"
+# 推奨: Connection Poolingを使用
+DATABASE_URL="postgresql://username:password@host:5432/database?connection_limit=1&pool_timeout=10"
+```
+
+### ALLOWED_ORIGIN
+
+フロントエンドアプリケーションのオリジン（CORS設定）
+
+```
+ALLOWED_ORIGIN="https://your-frontend-domain.vercel.app"
+```
+
+### NODE_ENV
+
+環境の種類
+
+```
+NODE_ENV="production"
 ```
 
 ## Vercelでの環境変数の設定方法
@@ -29,22 +49,22 @@ DATABASE_URL="postgresql://username:password@host:5432/database?schema=public"
 1. **Vercel Postgres**
    - Vercelの統合データベースサービス
    - 自動的に環境変数が設定される
-   - https://vercel.com/docs/storage/vercel-postgres
+   - <https://vercel.com/docs/storage/vercel-postgres>
 
 2. **Neon**
    - サーバーレスPostgreSQL
    - 無料枠あり
-   - https://neon.tech/
+   - <https://neon.tech/>
 
 3. **Supabase**
    - PostgreSQLベースのBaaS
    - 無料枠あり
-   - https://supabase.com/
+   - <https://supabase.com/>
 
 4. **Railway**
    - PostgreSQLホスティング
    - 無料枠あり
-   - https://railway.app/
+   - <https://railway.app/>
 
 ## デプロイ手順
 
@@ -64,14 +84,6 @@ vercel
 vercel --prod
 ```
 
-### 2. GitHubとの連携
-
-1. GitHubリポジトリにコードをプッシュ
-2. Vercelダッシュボードで "Import Project" をクリック
-3. GitHubリポジトリを選択
-4. 環境変数を設定
-5. デプロイ
-
 ### 3. デプロイ後の確認
 
 デプロイが完了したら、以下のエンドポイントにアクセスして動作確認:
@@ -82,9 +94,36 @@ vercel --prod
 
 ## トラブルシューティング
 
+### 504 Timeout エラー
+
+504 Timeout エラーが発生する場合、以下を確認してください:
+
+1. **DATABASE_URL に connection pooling パラメータを追加**
+
+   ```
+   DATABASE_URL="postgresql://username:password@host:5432/database?connection_limit=1&pool_timeout=10"
+   ```
+
+2. **データベースが Vercel からアクセス可能か確認**
+   - データベースがパブリックインターネットからアクセス可能である必要があります
+   - ファイアウォール設定を確認してください
+
+3. **ヘルスチェックエンドポイントで確認**
+Vercel の環境変数に `ALLOWED_ORIGIN` を設定してください:
+
+```
+ALLOWED_ORIGIN=https://your-frontend-domain.vercel.app
+```
+
+複数のオリジンを許可する場合は、`api/index.ts` を修正してください。**Vercel の関数実行時間制限**
+
+- 無料プランでは10秒、Proプランでは最大60秒まで設定可能
+- `vercel.json` で `maxDuration` を設定済み（30秒）
+
 ### ビルドエラー
 
 Prismaのクライアント生成でエラーが発生する場合:
+
 1. `vercel-build` スクリプトが正しく設定されているか確認
 2. `DATABASE_URL` が正しく設定されているか確認
 
