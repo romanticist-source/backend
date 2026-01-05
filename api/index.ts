@@ -28,6 +28,7 @@ import { UserScheduleUseCase } from "../internal/application/usecase/user-schedu
 import { AlertHistoryUseCase } from "../internal/application/usecase/alert-history-usecase.js";
 import { UserHelpCardUseCase } from "../internal/application/usecase/user-help-card-usecase.js";
 import { HelperConnectUseCase } from "../internal/application/usecase/helper-connect-usecase.js";
+import { AuthUseCase } from "../internal/application/usecase/auth-usecase.js";
 
 import { createUserRouter } from "../internal/router/user-router-openapi.js";
 import { createHelperRouter } from "../internal/router/helper-router-openapi.js";
@@ -37,17 +38,18 @@ import { createUserScheduleRouter } from "../internal/router/user-schedule-route
 import { createAlertHistoryRouter } from "../internal/router/alert-history-router-openapi.js";
 import { createUserHelpCardRouter } from "../internal/router/user-help-card-router-openapi.js";
 import { createHelperConnectRouter } from "../internal/router/helper-connect-router-openapi.js";
+import { createAuthRouter } from "../internal/router/auth-router-openapi.js";
 
 const app = new OpenAPIHono();
-const allowedOrigin = "http://localhost:8081";
-// CORS middleware
+
+// CORS middleware - Allow all origins in development
 app.use(
   "*",
   cors({
-    origin: allowedOrigin,
+    origin: "*",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
+    credentials: false,
   })
 );
 
@@ -110,6 +112,10 @@ const helperConnectRepository = new PrismaHelperConnectRepository(prisma);
 const helperConnectUseCase = new HelperConnectUseCase(helperConnectRepository);
 const helperConnectRouter = createHelperConnectRouter(helperConnectUseCase);
 
+// Auth
+const authUseCase = new AuthUseCase(userRepository);
+const authRouter = createAuthRouter(authUseCase);
+
 const welcomeStrings = [
   "Hello Hono!",
   "To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/backend/hono",
@@ -128,6 +134,7 @@ app.route("/user-schedules", userScheduleRouter);
 app.route("/alerts", alertHistoryRouter);
 app.route("/user-help-cards", userHelpCardRouter);
 app.route("/helper-connect", helperConnectRouter);
+app.route("/auth", authRouter);
 
 // OpenAPI JSON endpoint
 app.doc("/doc", {
@@ -154,9 +161,11 @@ if (process.env.NODE_ENV !== 'production') {
   serve({
     fetch: app.fetch,
     port,
+    hostname: '0.0.0.0',
   });
 
-  console.log(`🚀 Server is running on http://localhost:${port}`);
+  console.log(`🚀 Server is running on http://0.0.0.0:${port}`);
+  console.log(`📱 For mobile devices, use your PC's IP address`);
   console.log(`📚 Swagger UI: http://localhost:${port}/ui`);
   console.log(`📄 OpenAPI JSON: http://localhost:${port}/doc`);
 }

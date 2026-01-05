@@ -10,6 +10,7 @@ export async function seed(prisma: PrismaClient) {
       name: '佐藤 一郎',
       age: 75,
       mail: 'ichiro.sato@example.com',
+      password: '$2b$10$dummy.hash.for.seed.data.only.1234567890', // Dummy hashed password
       address: '東京都新宿区西新宿1-1-1',
       comment: '心臓病の既往歴あり。毎日の服薬管理が必要。',
     },
@@ -18,6 +19,7 @@ export async function seed(prisma: PrismaClient) {
       name: '田中 幸子',
       age: 82,
       mail: 'sachiko.tanaka@example.com',
+      password: '$2b$10$dummy.hash.for.seed.data.only.1234567890', // Dummy hashed password
       address: '東京都渋谷区渋谷2-2-2',
       comment: '認知症の初期症状あり。見守りが必要。',
     },
@@ -26,6 +28,7 @@ export async function seed(prisma: PrismaClient) {
       name: '山本 健太',
       age: 68,
       mail: 'kenta.yamamoto@example.com',
+      password: '$2b$10$dummy.hash.for.seed.data.only.1234567890', // Dummy hashed password
       address: '東京都品川区大崎3-3-3',
       comment: '糖尿病。食事管理と運動が重要。',
     },
@@ -34,6 +37,7 @@ export async function seed(prisma: PrismaClient) {
       name: '鈴木 博',
       age: 70,
       mail: 'hiroshi.suzuki@example.com',
+      password: '$2b$10$dummy.hash.for.seed.data.only.1234567890', // Dummy hashed password
       address: '東京都豊島区池袋4-4-4',
       comment: '健康維持のための予防医療に関心あり。',
     },
@@ -42,6 +46,7 @@ export async function seed(prisma: PrismaClient) {
       name: '高橋 由美',
       age: 45,
       mail: 'yumi.takahashi@example.com',
+      password: '$2b$10$dummy.hash.for.seed.data.only.1234567890', // Dummy hashed password
       address: '東京都港区赤坂5-5-5',
       comment: '事故によるリハビリ中。一時的な介助が必要。',
     },

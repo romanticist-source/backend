@@ -15,6 +15,7 @@ model User {
   name      String
   age       Int?
   mail      String   @unique
+  password  String
   icon      String?
   address   String?
   comment   String?

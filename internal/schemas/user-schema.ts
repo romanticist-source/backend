@@ -19,6 +19,7 @@ export const CreateUserSchema = z.object({
   name: z.string().min(1).openapi({ example: '山田太郎' }),
   age: z.number().int().positive().optional().openapi({ example: 65 }),
   mail: z.string().email().openapi({ example: 'yamada@example.com' }),
+  password: z.string().min(8).openapi({ example: 'password123' }),
   icon: z.string().url().optional().openapi({ example: 'https://lh3.googleusercontent.com/.../photo.jpg' }), // ← 追加
   address: z.string().optional().openapi({ example: '東京都渋谷区1-1-1' }),
   comment: z.string().optional().openapi({ example: '備考欄' })
