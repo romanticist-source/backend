@@ -1,4 +1,5 @@
-import { createRoute, OpenAPIHono, z, extendZodWithOpenApi } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { z } from "../lib/zod.js";
 import { getCookie } from "hono/cookie";
 import bcrypt from "bcrypt";
 import type { UserUseCase } from "../application/usecase/user-usecase.js";
@@ -8,9 +9,6 @@ import {
   UpdateUserSchema,
   ErrorSchema,
 } from "../schemas/user-schema.js";
-
-// Zodにopenapiメソッドを追加
-extendZodWithOpenApi(z);
 
 // Presentation Layer - HTTP Router (Adapter) with OpenAPI
 export function createUserRouter(userUseCase: UserUseCase) {
