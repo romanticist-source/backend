@@ -37,6 +37,7 @@ export const CreateUserSchema = z
     name: z.string().min(1).openapi({ example: "山田太郎" }),
     age: z.number().int().positive().optional().openapi({ example: 65 }),
     mail: z.string().email().openapi({ example: "yamada@example.com" }),
+    password: z.string().min(8).openapi({ example: "password123" }),
     icon: z
       .string()
       .regex(/^https?:\/\/.+/)

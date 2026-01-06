@@ -1,18 +1,15 @@
-import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
-import { extendZodWithOpenApi } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
+import { z } from '../lib/zod.js'
 import type { UserScheduleUseCase } from '../application/usecase/user-schedule-usecase.js'
-import { 
-  UserScheduleSchema, 
-  CreateUserScheduleSchema, 
+import {
+  UserScheduleSchema,
+  CreateUserScheduleSchema,
   UpdateUserScheduleSchema,
   UserRepeatScheduleSchema,
   CreateUserRepeatScheduleSchema,
   UpdateUserRepeatScheduleSchema,
-  ErrorSchema 
+  ErrorSchema
 } from '../schemas/user-schedule-schema.js'
-
-// Zodにopenapiメソッドを追加
-extendZodWithOpenApi(z);
 
 export function createUserScheduleRouter(useCase: UserScheduleUseCase) {
   const router = new OpenAPIHono()

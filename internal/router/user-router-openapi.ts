@@ -1,5 +1,7 @@
-import { createRoute, OpenAPIHono, z, extendZodWithOpenApi } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { z } from "../lib/zod.js";
 import { getCookie } from "hono/cookie";
+import bcrypt from "bcrypt";
 import type { UserUseCase } from "../application/usecase/user-usecase.js";
 import {
   UserSchema,
@@ -7,9 +9,6 @@ import {
   UpdateUserSchema,
   ErrorSchema,
 } from "../schemas/user-schema.js";
-
-// Zodにopenapiメソッドを追加
-extendZodWithOpenApi(z);
 
 // Presentation Layer - HTTP Router (Adapter) with OpenAPI
 export function createUserRouter(userUseCase: UserUseCase) {
@@ -243,20 +242,28 @@ export function createUserRouter(userUseCase: UserUseCase) {
   router.openapi(createUserRoute, async (c) => {
     try {
       const body = c.req.valid("json");
+
+      // Hash the password before storing
+      const hashedPassword = await bcrypt.hash(body.password, 10);
+
       const createInput = {
         ...body,
+        password: hashedPassword,
         icon: body.icon ?? "",
         address: body.address ?? "",
         comment: body.comment ?? "",
       };
       const user = await userUseCase.createUser(createInput);
 
+      // Remove password from response
+      const { password, ...userWithoutPassword } = user;
+
       return c.json(
         {
-          ...user,
-          age: user.age ?? 0,
-          createdAt: user.createdAt.toISOString(),
-          updatedAt: user.updatedAt.toISOString(),
+          ...userWithoutPassword,
+          age: userWithoutPassword.age ?? 0,
+          createdAt: userWithoutPassword.createdAt.toISOString(),
+          updatedAt: userWithoutPassword.updatedAt.toISOString(),
         },
         201
       );

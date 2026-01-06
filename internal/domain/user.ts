@@ -4,6 +4,7 @@ export interface User {
   name: string
   age?: number | null
   mail: string
+  password: string
   icon?: string | null
   address?: string | null
   comment?: string | null
