@@ -30,22 +30,48 @@ model User {
   repeatSchedules   UserRepeatSchedule[]
   emergencyContacts EmergencyContact[]
   userAlertHistory  UserAlertHistory[]
+  helperConnects    HelperConnect[]
 
   @@map("user")
 }
 
 model Helper {
-  id           String @id @default(dbgenerated("gen_random_uuid()"))
+  id           String    @id @default(dbgenerated("gen_random_uuid()"))
   name         String
   nickname     String
-  phoneNumber  String @map("phone_number")
-  email        String @unique
+  phoneNumber  String    @map("phone_number")
+  email        String    @unique
+  password     String?
   relationship String
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  isDeleted    Boolean   @default(false) @map("is_deleted")
 
   emergencyContacts  EmergencyContact[]
   helperAlertHistory HelperAlertHistory[]
+  helperConnects     HelperConnect[]
 
   @@map("helper")
+}
+
+model HelperConnect {
+  id        String    @id @default(dbgenerated("gen_random_uuid()"))
+  userId    String    @map("user_id")
+  helperId  String    @map("helper_id")
+  status    String    @default("pending")
+
+  isDeleted Boolean   @default(false) @map("is_deleted")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  helper Helper @relation(fields: [helperId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, helperId])
+  @@map("helper_connect")
 }
 
 model EmergencyContact {
