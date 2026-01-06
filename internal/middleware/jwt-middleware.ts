@@ -1,9 +1,11 @@
 import { Context, Next } from 'hono'
 import jwt from 'jsonwebtoken'
+import type { UserRole } from '../domain/auth.js'
 
 export interface JwtPayload {
   userId: string
   mail: string
+  role?: UserRole // Optional for backward compatibility
 }
 
 export async function jwtMiddleware(c: Context, next: Next) {
@@ -23,9 +25,17 @@ export async function jwtMiddleware(c: Context, next: Next) {
 
     const payload = jwt.verify(token, secret) as JwtPayload
 
+    // Backward compatibility check: Reject tokens without role field
+    if (!payload.role) {
+      return c.json({
+        errorMessage: '認証情報が古いため、再ログインが必要です'
+      }, 401)
+    }
+
     // Store user info in context for use in route handlers
     c.set('userId', payload.userId)
     c.set('userMail', payload.mail)
+    c.set('userRole', payload.role)
 
     await next()
   } catch (error) {
