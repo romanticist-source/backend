@@ -2,6 +2,7 @@ import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
 import { z } from '../lib/zod.js'
 import type { AlertHistoryUseCase } from '../application/usecase/alert-history-usecase.js'
 import { AlertHistorySchema, CreateAlertHistorySchema, UpdateAlertHistorySchema, ErrorSchema } from '../schemas/alert-history-schema.js'
+import { LineMessagingUseCase } from '../application/usecase/line-webhook-usecase.js'
 
 // User/Helper Alert History Schemas
 const UserAlertHistorySchema = z.object({
@@ -166,6 +167,26 @@ export function createAlertHistoryRouter(useCase: AlertHistoryUseCase) {
       try {
         const body = c.req.valid('json')
         const alert = await useCase.createAlert(body)
+        console.log("🔥 [DEBUG] DB登録完了、LINE送信を開始します");
+        
+        // c.env または process.env から取得
+        const targetId = process.env.LINE_USER_ID || process.env.LINE_USER_ID;
+        const token = process.env.LINE_CHANNEL_ACCESS_TOKEN || process.env.LINE_CHANNEL_ACCESS_TOKEN;
+
+        if (targetId && token) {
+          const lineUseCase = new LineMessagingUseCase();
+          // DBから返ってきた description またはリクエストの description を使用
+          const message = alert.description || body.description || "アラートが発生しました";
+          
+          await lineUseCase.sendPushMessage(
+            targetId.trim(),
+            message,
+            token.trim()
+          );
+          console.log("🚀 [DEBUG] LINE送信成功");
+        } else {
+          console.error("❌ [DEBUG] LINEの環境変数が不足しています");
+        }
         return c.json({
           ...alert,
           createdAt: alert.createdAt.toISOString()
