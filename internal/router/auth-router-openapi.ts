@@ -1,5 +1,6 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
 import type { AuthUseCase } from '../application/usecase/auth-usecase.js'
+import type { UserRole } from '../domain/auth.js'
 import {
   LoginRequestSchema,
   LoginResponseSchema,
@@ -10,10 +11,14 @@ import {
   RegisterResponseSchema
 } from '../schemas/auth-schema.js'
 import { jwtMiddleware } from '../middleware/jwt-middleware.js'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 type Variables = {
   userId: string
   userMail: string
+  userRole: UserRole
 }
 
 export function createAuthRouter(authUseCase: AuthUseCase) {
@@ -109,7 +114,7 @@ export function createAuthRouter(authUseCase: AuthUseCase) {
     }
   )
 
-  // GET /auth/me - Get current user info
+  // GET /auth/me - Get current user info (User or Helper)
   router.use('/me', jwtMiddleware)
   router.openapi(
     createRoute({
@@ -117,7 +122,7 @@ export function createAuthRouter(authUseCase: AuthUseCase) {
       path: '/me',
       tags: ['Authentication'],
       summary: '認証済みユーザー情報取得',
-      description: 'JWTトークンから認証済みユーザーの情報を取得します',
+      description: 'JWTトークンから認証済みユーザー（UserまたはHelper）の情報を取得します',
       security: [{ bearerAuth: [] }],
       responses: {
         200: {
@@ -133,18 +138,45 @@ export function createAuthRouter(authUseCase: AuthUseCase) {
     async (c) => {
       try {
         const userId = c.get('userId') as string
-        const user = await authUseCase.getUserById(userId)
+        const userRole = c.get('userRole') as UserRole
 
-        if (!user) {
-          return c.json({ errorMessage: 'ユーザーが見つかりません' }, 401)
+        if (userRole === 'user') {
+          // Get User info
+          const user = await authUseCase.getUserById(userId)
+
+          if (!user) {
+            return c.json({ errorMessage: 'ユーザーが見つかりません' }, 401)
+          }
+
+          return c.json({
+            ...user,
+            role: 'user' as UserRole,
+            createdAt: user.createdAt.toISOString(),
+            updatedAt: user.updatedAt.toISOString()
+          }, 200)
+        } else {
+          // Get Helper info
+          const helper = await prisma.helper.findUnique({
+            where: { id: userId }
+          })
+
+          if (!helper) {
+            return c.json({ errorMessage: 'ヘルパーが見つかりません' }, 401)
+          }
+
+          return c.json({
+            id: helper.id,
+            role: 'helper' as UserRole,
+            name: helper.name,
+            mail: helper.email,
+            age: null,
+            icon: null,
+            address: null,
+            comment: null,
+            createdAt: helper.createdAt.toISOString(),
+            updatedAt: helper.updatedAt.toISOString()
+          }, 200)
         }
-
-        // Convert dates to ISO strings
-        return c.json({
-          ...user,
-          createdAt: user.createdAt.toISOString(),
-          updatedAt: user.updatedAt.toISOString()
-        }, 200)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'ユーザー情報の取得に失敗しました'
         return c.json({ errorMessage: message }, 401)

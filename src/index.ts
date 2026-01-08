@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { PrismaClient } from "@prisma/client";
 import { Hono } from "hono"; // Vercel detection
+import { serve } from "@hono/node-server";
 
 import { PrismaUserRepository } from "../internal/adapters/gateways/prisma-user-repository.js";
 import { PrismaHelperRepository } from "../internal/adapters/gateways/prisma-helper-repository.js";
@@ -18,6 +19,7 @@ import { PrismaAlertHistoryRepository } from "../internal/adapters/gateways/pris
 import { PrismaUserHelpCardRepository } from "../internal/adapters/gateways/prisma-user-help-card-repository.js";
 import { PrismaHelperConnectRepository } from "../internal/adapters/gateways/prisma-helper-connect-repository.js";
 
+import { AuthUseCase } from "../internal/application/usecase/auth-usecase.js";
 import { UserUseCase } from "../internal/application/usecase/user-usecase.js";
 import { HelperUseCase } from "../internal/application/usecase/helper-usecase.js";
 import { EmergencyContactUseCase } from "../internal/application/usecase/emergency-contact-usecase.js";
@@ -27,6 +29,7 @@ import { AlertHistoryUseCase } from "../internal/application/usecase/alert-histo
 import { UserHelpCardUseCase } from "../internal/application/usecase/user-help-card-usecase.js";
 import { HelperConnectUseCase } from "../internal/application/usecase/helper-connect-usecase.js";
 
+import { createAuthRouter } from "../internal/router/auth-router-openapi.js";
 import { createUserRouter } from "../internal/router/user-router-openapi.js";
 import { createHelperRouter } from "../internal/router/helper-router-openapi.js";
 import { createEmergencyContactRouter } from "../internal/router/emergency-contact-router-openapi.js";
@@ -90,6 +93,11 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // Dependency Injection - Wiring up the Hexagonal Architecture
+// Auth
+const authUserRepository = new PrismaUserRepository(prisma);
+const authUseCase = new AuthUseCase(authUserRepository);
+const authRouter = createAuthRouter(authUseCase);
+
 // User
 const userRepository = new PrismaUserRepository(prisma);
 const userUseCase = new UserUseCase(userRepository);
@@ -186,6 +194,7 @@ app.get("/health/db", async (c) => {
 });
 
 // Mount routes with /api prefix
+app.route("/auth", authRouter);
 app.route("/users", userRouter);
 app.route("/helpers", helperRouter);
 app.route("/emergency-contacts", emergencyContactRouter);
@@ -232,5 +241,18 @@ app.doc("/doc", {
 
 // Swagger UI endpoint
 app.get("/ui", swaggerUI({ url: "/doc" }));
+
+// Start server in development mode
+if (process.env.NODE_ENV !== 'production') {
+  const port = 3009
+  console.log(`Server is running on http://localhost:${port}`)
+  console.log(`Server is also accessible on http://0.0.0.0:${port}`)
+
+  serve({
+    fetch: app.fetch,
+    port,
+    hostname: '0.0.0.0',
+  })
+}
 
 export default app;
