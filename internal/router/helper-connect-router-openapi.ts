@@ -126,7 +126,7 @@ export function createHelperConnectRouter(helperConnectUseCase: HelperConnectUse
         return c.json({ connections: formattedConnections }, 200)
       } catch (error) {
         const message = error instanceof Error ? error.message : '保留中リクエストの取得に失敗しました'
-        return c.json({ errorMessage: message }, 400)
+        return c.json({ errorMessage: message }, 401)
       }
     }
   )
@@ -286,7 +286,7 @@ export function createHelperConnectRouter(helperConnectUseCase: HelperConnectUse
         return c.json({ connections: formattedConnections }, 200)
       } catch (error) {
         const message = error instanceof Error ? error.message : '接続一覧の取得に失敗しました'
-        return c.json({ errorMessage: message }, 400)
+        return c.json({ errorMessage: message }, 401)
       }
     }
   )
