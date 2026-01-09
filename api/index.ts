@@ -59,35 +59,33 @@ const allowedOrigins = [
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
 ].filter(Boolean) as string[];
 
-// CORS middleware - only run in development (Vercel uses vercel.json headers)
-if (process.env.NODE_ENV !== "production") {
-  app.use("*", async (c, next) => {
-    const origin = c.req.header("Origin");
-    const isAllowed =
-      allowedOrigins.includes(origin as string) ||
-      origin?.endsWith(".vercel.app");
-    const allowedOrigin = isAllowed ? origin : allowedOrigins[0];
+// CORS middleware - runs in all environments
+app.use("*", async (c, next) => {
+  const origin = c.req.header("Origin");
+  const isAllowed =
+    allowedOrigins.includes(origin as string) ||
+    origin?.endsWith(".vercel.app");
+  const allowedOrigin = isAllowed ? origin : allowedOrigins[0];
 
-    // Handle preflight requests
-    if (c.req.method === "OPTIONS") {
-      c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
-      c.header(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-      );
-      c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-      c.header("Access-Control-Allow-Credentials", "true");
-      c.header("Access-Control-Max-Age", "86400");
-      return c.body(null, 204);
-    }
-
-    await next();
-
-    // Add CORS headers to all responses
+  // Handle preflight requests
+  if (c.req.method === "OPTIONS") {
     c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
+    c.header(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    );
+    c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     c.header("Access-Control-Allow-Credentials", "true");
-  });
-}
+    c.header("Access-Control-Max-Age", "86400");
+    return c.body(null, 204);
+  }
+
+  await next();
+
+  // Add CORS headers to all responses
+  c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
+  c.header("Access-Control-Allow-Credentials", "true");
+});
 
 // Dependency Injection - Wiring up the Hexagonal Architecture
 // User
