@@ -1,4 +1,5 @@
 {
+  "buildCommand": "pnpm db:generate && pnpm db:migrate:deploy",
   "functions": {
     "src/index.ts": {
       "maxDuration": 10
