@@ -1,13 +1,13 @@
 {
   "buildCommand": "pnpm db:generate && pnpm db:migrate:deploy",
   "functions": {
-    "src/index.ts": {
+    "api/index.ts": {
       "maxDuration": 10
     }
   },
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Credentials", "value": "true" },
         { "key": "Access-Control-Allow-Origin", "value": "*" },
