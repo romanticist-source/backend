@@ -153,13 +153,13 @@ const userHelpCardRouter = createUserHelpCardRouter(userHelpCardUseCase);
 
 // Helper Connect
 const helperConnectRepository = new PrismaHelperConnectRepository(prisma);
-const helperConnectUseCase = new HelperConnectUseCase(helperConnectRepositor
+const helperConnectUseCase = new HelperConnectUseCase(helperConnectRepository);
+const helperConnectRouter = createHelperConnectRouter(helperConnectUseCase);
 
 // User Fatigue
 const userFatigueRepository = new PrismaUserFatigueRepository(prisma);
 const userFatigueUseCase = new UserFatigueUseCase(userFatigueRepository);
-const userFatigueRouter = createUserFatigueRouter(userFatigueUseCase);y);
-const helperConnectRouter = createHelperConnectRouter(helperConnectUseCase);
+const userFatigueRouter = createUserFatigueRouter(userFatigueUseCase);
 
 const welcomeStrings = [
   "Hello Hono!",
@@ -205,8 +205,8 @@ app.get("/health/db", async (c) => {
 app.route("/auth", authRouter);
 app.route("/users", userRouter);
 app.route("/helpers", helperRouter);
-app.route("/emergency-contacts", emergencyContactR
-app.route("/user-fatigue", userFatigueRouter);outer);
+app.route("/emergency-contacts", emergencyContactRouter);
+app.route("/user-fatigue", userFatigueRouter);
 app.route("/user-status-cards", userStatusCardRouter);
 app.route("/user-schedules", userScheduleRouter);
 app.route("/alerts", alertHistoryRouter);
