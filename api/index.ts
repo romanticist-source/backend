@@ -67,26 +67,21 @@ app.use("*", async (c, next) => {
   const isAllowed =
     allowedOrigins.includes(origin as string) ||
     origin?.endsWith(".vercel.app");
-  const allowedOrigin = isAllowed ? origin : allowedOrigins[0];
+  const allowedOrigin = isAllowed ? origin : "*";
+
+  // Set CORS headers before handling request
+  c.header("Access-Control-Allow-Origin", allowedOrigin);
+  c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+  c.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version, X-CSRF-Token");
+  c.header("Access-Control-Allow-Credentials", "true");
+  c.header("Access-Control-Max-Age", "86400");
 
   // Handle preflight requests
   if (c.req.method === "OPTIONS") {
-    c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
-    c.header(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-    );
-    c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    c.header("Access-Control-Allow-Credentials", "true");
-    c.header("Access-Control-Max-Age", "86400");
     return c.body(null, 204);
   }
 
   await next();
-
-  // Add CORS headers to all responses
-  c.header("Access-Control-Allow-Origin", allowedOrigin || "*");
-  c.header("Access-Control-Allow-Credentials", "true");
 });
 
 // Dependency Injection - Wiring up the Hexagonal Architecture
