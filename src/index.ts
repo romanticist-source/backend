@@ -18,6 +18,7 @@ import {
 import { PrismaAlertHistoryRepository } from "../internal/adapters/gateways/prisma-alert-history-repository.js";
 import { PrismaUserHelpCardRepository } from "../internal/adapters/gateways/prisma-user-help-card-repository.js";
 import { PrismaHelperConnectRepository } from "../internal/adapters/gateways/prisma-helper-connect-repository.js";
+import { PrismaUserFatigueRepository } from "../internal/adapters/gateways/prisma-user-fatigue-repository.js";
 
 import { AuthUseCase } from "../internal/application/usecase/auth-usecase.js";
 import { UserUseCase } from "../internal/application/usecase/user-usecase.js";
@@ -28,6 +29,7 @@ import { UserScheduleUseCase } from "../internal/application/usecase/user-schedu
 import { AlertHistoryUseCase } from "../internal/application/usecase/alert-history-usecase.js";
 import { UserHelpCardUseCase } from "../internal/application/usecase/user-help-card-usecase.js";
 import { HelperConnectUseCase } from "../internal/application/usecase/helper-connect-usecase.js";
+import { UserFatigueUseCase } from "../internal/application/usecase/user-fatigue-usecase.js";
 
 import { createAuthRouter } from "../internal/router/auth-router-openapi.js";
 import { createUserRouter } from "../internal/router/user-router-openapi.js";
@@ -38,6 +40,7 @@ import { createUserScheduleRouter } from "../internal/router/user-schedule-route
 import { createAlertHistoryRouter } from "../internal/router/alert-history-router-openapi.js";
 import { createUserHelpCardRouter } from "../internal/router/user-help-card-router-openapi.js";
 import { createHelperConnectRouter } from "../internal/router/helper-connect-router-openapi.js";
+import { createUserFatigueRouter } from "../internal/router/user-fatigue-router-openapi.js";
 
 // Prisma Client singleton for serverless environments
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
@@ -153,6 +156,11 @@ const helperConnectRepository = new PrismaHelperConnectRepository(prisma);
 const helperConnectUseCase = new HelperConnectUseCase(helperConnectRepository);
 const helperConnectRouter = createHelperConnectRouter(helperConnectUseCase);
 
+// User Fatigue
+const userFatigueRepository = new PrismaUserFatigueRepository(prisma);
+const userFatigueUseCase = new UserFatigueUseCase(userFatigueRepository);
+const userFatigueRouter = createUserFatigueRouter(userFatigueUseCase);
+
 const welcomeStrings = [
   "Hello Hono!",
   "To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/backend/hono",
@@ -198,6 +206,7 @@ app.route("/auth", authRouter);
 app.route("/users", userRouter);
 app.route("/helpers", helperRouter);
 app.route("/emergency-contacts", emergencyContactRouter);
+app.route("/user-fatigue", userFatigueRouter);
 app.route("/user-status-cards", userStatusCardRouter);
 app.route("/user-schedules", userScheduleRouter);
 app.route("/alerts", alertHistoryRouter);
