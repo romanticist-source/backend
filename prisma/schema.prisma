@@ -31,6 +31,7 @@ model User {
   emergencyContacts EmergencyContact[]
   userAlertHistory  UserAlertHistory[]
   helperConnects    HelperConnect[]
+  fatigueRecords    UserFatigue[]
 
   @@map("user")
 }
@@ -195,5 +196,17 @@ model HelperAlertHistory {
 
   @@id([helperId, alertId])
   @@map("helper_alert_history")
+}
+
+model UserFatigue {
+  id           String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId       String   @map("user_id")
+  fatigueLevel Int      @map("fatigue_level")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_fatigue")
 }
 
