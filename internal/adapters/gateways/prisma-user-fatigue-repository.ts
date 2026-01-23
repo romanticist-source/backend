@@ -4,10 +4,10 @@ import {
   UserFatigueRepository,
   CreateUserFatigueInput,
   UpdateUserFatigueInput,
-} from "../../domain/user-fatigue";
+} from "../../domain/user-fatigue.js";
 
 export class PrismaUserFatigueRepository implements UserFatigueRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   async findAll(): Promise<UserFatigue[]> {
     const records = await this.prisma.userFatigue.findMany({

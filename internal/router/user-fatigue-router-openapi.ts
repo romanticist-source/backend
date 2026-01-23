@@ -1,5 +1,5 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { UserFatigueUseCase } from "../application/usecase/user-fatigue-usecase";
+import { UserFatigueUseCase } from "../application/usecase/user-fatigue-usecase.js";
 import {
   UserFatigueSchema,
   CreateUserFatigueSchema,
@@ -8,7 +8,8 @@ import {
   UserFatigueIdParamSchema,
   UserIdParamSchema,
   ErrorSchema,
-} from "../schemas/user-fatigue-schema";
+} from "../schemas/user-fatigue-schema.js";
+import { UserFatigue } from "../domain/user-fatigue.js";
 
 type Variables = {
   userFatigueUseCase: UserFatigueUseCase;
@@ -43,7 +44,7 @@ export const createUserFatigueRouter = (useCase: UserFatigueUseCase) => {
   router.openapi(getAllRoute, async (c) => {
     const useCase = c.get("userFatigueUseCase");
     const records = await useCase.getAll();
-    const response = records.map((r) => ({
+    const response = records.map((r: UserFatigue) => ({
       ...r,
       createdAt: r.createdAt.toISOString(),
       updatedAt: r.updatedAt.toISOString(),
@@ -122,7 +123,7 @@ export const createUserFatigueRouter = (useCase: UserFatigueUseCase) => {
     const { userId } = c.req.valid("param");
     const useCase = c.get("userFatigueUseCase");
     const records = await useCase.getByUserId(userId);
-    const response = records.map((r) => ({
+    const response = records.map((r: UserFatigue) => ({
       ...r,
       createdAt: r.createdAt.toISOString(),
       updatedAt: r.updatedAt.toISOString(),

@@ -3,10 +3,10 @@ import {
   UserFatigueRepository,
   CreateUserFatigueInput,
   UpdateUserFatigueInput,
-} from "../../domain/user-fatigue";
+} from "../../domain/user-fatigue.js";
 
 export class UserFatigueUseCase {
-  constructor(private repository: UserFatigueRepository) {}
+  constructor(private readonly repository: UserFatigueRepository) {}
 
   async getAll(): Promise<UserFatigue[]> {
     return this.repository.findAll();
